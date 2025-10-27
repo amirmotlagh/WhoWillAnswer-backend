@@ -2,7 +2,7 @@
 
 
 # Project Proposal Structure
-
+```
 whowillanswer/
 ├── app/
 │   ├── __init__.py
@@ -167,9 +167,10 @@ whowillanswer/
 ├── pyproject.toml                   # Poetry or pip dependencies
 ├── requirements.txt
 └── README.md
-
+```
 
 # Architecture Diagram
+```
 ┌─────────────────────────────────────────────────────────────┐
 │                     React/TS Frontend                       │
 │         (WebSocket + REST API Communication)                │
@@ -233,9 +234,10 @@ whowillanswer/
 │  │              │  │   states    │  │                     │ │
 │  └──────────────┘  └─────────────┘  └─────────────────────┘ │
 └──────────────────────────────────────────────────────────────┘
-
+```
 
 # Game Flow Sequence
+```
 ┌─────────┐     ┌─────────┐     ┌──────────┐     ┌────────┐
 │ Player  │     │FastAPI  │     │  Redis   │     │  NATS  │
 └────┬────┘     └────┬────┘     └─────┬────┘     └───┬────┘
@@ -314,3 +316,4 @@ whowillanswer/
      │               │                │              │
      │<── Game results ───────────────│              │
      │               │                │              │
+```
