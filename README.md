@@ -169,7 +169,7 @@ whowillanswer/
 └── README.md
 
 
-# Architucture Diagram
+# Architecture Diagram
 ┌─────────────────────────────────────────────────────────────┐
 │                     React/TS Frontend                       │
 │         (WebSocket + REST API Communication)                │
