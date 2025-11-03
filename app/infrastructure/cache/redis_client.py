@@ -1,4 +1,6 @@
 import redis.asyncio as redis
+from app.config import  settings
+
 
 redis_client = redis.Redis(
     host=settings.REDIS_HOST,
