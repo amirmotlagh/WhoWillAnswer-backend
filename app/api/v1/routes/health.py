@@ -5,10 +5,10 @@ r=redis.Redis(host=settings.REDIS_HOST,socket_timeout=1)
 def is_redis_available():
     try:
         r.ping()
-        #print("Redis is healthy")
+        ##TODO add logging
         return True
     except Exception:
-        #print("Redis is not available")
+        ##TODO add logging
         return False
 
 
