@@ -349,6 +349,7 @@ docker exec -it redis redis-cli ping
 # -> PONG
 
 3️⃣ Using CacheService
+```python
 You can easily store and retrieve game or room states:
 from app.infrastructure.cache.cache_service import CacheService
 await CacheService.set("room:123:state", "active")
@@ -356,6 +357,9 @@ state = await CacheService.get("room:123:state")
 print(state)  # -> active
 
 4️⃣ Health Check
+
+**File:**  
+```python
 File: app/v1/routes/health.py
 Function: is_redis_available()
 Verify Redis connectivity:
