@@ -339,6 +339,7 @@ REDIS_PORT=6379
 # Optional
 REDIS_PASSWORD=
 REDIS_DB=0
+```
 
 2️⃣ Run Redis (with Docker)
 If you don’t have Redis installed locally:
