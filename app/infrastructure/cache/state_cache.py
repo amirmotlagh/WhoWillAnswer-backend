@@ -10,7 +10,7 @@ async def get_room_state(room_id):
     key = key_builder.room_state_key(room_id)
     return await CacheService.get(key)
 
-async  def delete_room_state(room_id):
+async def delete_room_state(room_id):
     key = key_builder.room_state_key(room_id)
     await CacheService.delete(key)
 
