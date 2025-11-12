@@ -14,7 +14,7 @@ async def delete_room_state(room_id):
     key = key_builder.room_state_key(room_id)
     await CacheService.delete(key)
 
-async def set_game_state(game_id,state):
+async def set_game_state(game_id, state):
     key = key_builder.game_state_key(game_id)
     await CacheService.set(key, state)
 
