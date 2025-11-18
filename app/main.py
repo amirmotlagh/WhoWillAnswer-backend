@@ -13,6 +13,7 @@ async def lifespan(app: FastAPI):
     # resource.initialize()
     yield
     # TODO: Add your shutdown logic here
+    await redis_client.disconnect()
     # For example, you might want to disconnect from a database
     # db.disconnect()
     # Or release some resources
