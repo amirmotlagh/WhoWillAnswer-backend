@@ -371,6 +371,7 @@ Returns HTTP 200 if Redis responds successfully.
 Returns HTTP 503 if Redis is unreachable or an error occurs.
 
 5️⃣ Key Naming Convention
+
 All Redis keys follow this format:
 room:{room_id}:state
 game:{game_id}:state
