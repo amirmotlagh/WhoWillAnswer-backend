@@ -10,7 +10,7 @@ RUN adduser -D myuser
 USER myuser
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
-COPY . .
+COPY app .
 RUN mkdir -p /var/log/django/ && \
     touch /var/log/django/errors.log
 RUN python manage.py collectstatic --noinput
