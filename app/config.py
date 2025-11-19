@@ -10,9 +10,11 @@ ENV_FILE = f".env.{ENV}"
 if not os.path.exists(ENV_FILE):
     print(f"Warning: Environment file '{ENV_FILE}' does not exist.", file=sys.stderr)
 
+
 class Settings(BaseSettings):
     DEBUG: bool = False
     model_config = {
         "env_file": ENV_FILE
     }
+
 settings = Settings()
