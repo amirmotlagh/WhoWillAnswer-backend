@@ -351,7 +351,7 @@ To verify it’s running:
 docker exec -it redis redis-cli ping
 # -> PONG
 ```
-3️⃣ Using CacheService
+### 3️⃣ Using CacheService
 ```python
 You can easily store and retrieve game or room states:
 from app.infrastructure.cache.cache_service import CacheService
@@ -359,8 +359,8 @@ await CacheService.set("room:123:state", "active")
 state = await CacheService.get("room:123:state")
 print(state)  # -> active
 
-4️⃣ Health Check
 
+### 4️⃣ Health Check
 **File:**  
 ```python
 File: app/v1/routes/health.py
@@ -372,7 +372,7 @@ Response:
 Returns HTTP 200 if Redis responds successfully.
 Returns HTTP 503 if Redis is unreachable or an error occurs.
 
-5️⃣ Key Naming Convention
+### 5️⃣ Key Naming Convention
 
 All Redis keys follow this format:
 room:{room_id}:state
