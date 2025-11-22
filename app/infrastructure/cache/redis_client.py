@@ -1,5 +1,5 @@
 import redis.asyncio as redis
-from app.config import  settings
+from app.config import settings
 
 
 class RedisClient:
