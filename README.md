@@ -375,8 +375,8 @@ Returns HTTP 503 if Redis is unreachable or an error occurs.
 ### 5️⃣ Key Naming Convention
 
 All Redis keys follow this format:
-room:{room_id}:state
-game:{game_id}:state
+`room:{room_id}:state`
+`game:{game_id}:state`
 
 ✅ Summary
 Async Redis integration
