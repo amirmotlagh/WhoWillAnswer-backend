@@ -1,12 +1,10 @@
-import redis.asyncio as redis
 from starlette.responses import JSONResponse
-
 from app.config import settings
+from app.infrastructure.cache.redis_client import redis_client
 
-r = redis.Redis(host=settings.REDIS_HOST, socket_timeout=1)
 async def is_redis_available():
     try:
-        await r.ping()
+        await redis_client.health_check()
         ##TODO: add logging
         return JSONResponse(status_code=200, content={"status": "ok"})
     except Exception:
