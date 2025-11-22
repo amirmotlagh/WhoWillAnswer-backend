@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
 
-model_config = {
+    model_config = {
         "env_file": ENV_FILE
     }
 settings = Settings()
