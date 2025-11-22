@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     REDIS_HOST: str = 'localhost'
     REDIS_PORT: int = '6379'
-    REDIS_MAX_CONNECTIONS : int = 10
+    REDIS_MAX_CONNECTIONS: int = 10
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
 
