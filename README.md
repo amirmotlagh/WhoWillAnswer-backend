@@ -341,7 +341,7 @@ REDIS_PASSWORD=
 REDIS_DB=0
 ```
 
-###2️⃣ Run Redis (with Docker)
+### 2️⃣ Run Redis (with Docker)
 If you don’t have Redis installed locally:
 ```
 docker run -d --name redis -p 6379:6379 redis
