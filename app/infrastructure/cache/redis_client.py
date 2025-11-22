@@ -10,7 +10,7 @@ class RedisClient:
 
     async def connect(self):
         if not self._pool:
-            self._pool =  redis.ConnectionPool(
+            self._pool = redis.ConnectionPool(
                 host=settings.REDIS_HOST,
                 port=settings.REDIS_PORT,
                 decode_responses=True,
