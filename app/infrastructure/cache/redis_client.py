@@ -5,8 +5,8 @@ from app.config import settings
 class RedisClient:
 
     def __init__(self):
-        self._pool=None
-        self._client =None
+        self._pool = None
+        self._client = None
 
     async def connect(self):
         if not self._pool:
