@@ -346,9 +346,11 @@ If you don’t have Redis installed locally:
 ```
 docker run -d --name redis -p 6379:6379 redis
 To verify it’s running:
+```
+```
 docker exec -it redis redis-cli ping
 # -> PONG
-
+```
 3️⃣ Using CacheService
 ```python
 You can easily store and retrieve game or room states:
