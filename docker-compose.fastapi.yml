@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build: app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fastapi_db
+      - REDIS_URL=redis://redis:6379/0
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - postgres
+      - redis
+      - nats
+    volumes:
+      - .:/app
+    restart: unless-stopped
