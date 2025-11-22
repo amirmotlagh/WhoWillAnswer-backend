@@ -3,7 +3,7 @@ from starlette.responses import JSONResponse
 
 from app.config import settings
 
-r = redis.Redis(host=settings.REDIS_HOST,socket_timeout=1)
+r = redis.Redis(host=settings.REDIS_HOST, socket_timeout=1)
 async def is_redis_available():
     try:
         await r.ping()
