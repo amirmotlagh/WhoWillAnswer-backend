@@ -9,7 +9,3 @@ services:
       - "4222:4222"
       - "8222:8222"  # Optional: NATS monitoring port
     restart: unless-stopped
-
-volumes:
-  postgres_data:
-  redis_data:
