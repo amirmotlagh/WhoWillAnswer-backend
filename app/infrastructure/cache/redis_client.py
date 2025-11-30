@@ -28,7 +28,7 @@ class RedisClient:
 
     async def get_client(self):
         if not self._client:
-            raise RuntimeError("Redis client not connected. Call connect() first.")
+            await self.connect()
         return self._client
 
     async def health_check(self):
