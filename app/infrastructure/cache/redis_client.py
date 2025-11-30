@@ -26,7 +26,7 @@ class RedisClient:
             self._client = None
             # TODO: add logging
 
-    def get_client(self):
+    async def get_client(self):
         if not self._client:
             raise RuntimeError("Redis client not connected. Call connect() first.")
         return self._client
