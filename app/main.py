@@ -5,19 +5,15 @@ from fastapi import FastAPI
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # TODO: Add your startup logic here
-    await redis_client.connect()
-    # For example, you might want to connect to a database
-    # db.connect()
-    # Or initialize some resources
-    # resource.initialize()
+    try:
+        await redis_client.connect()
+    except Exception as e:
+        ##TODO add logging
+        raise RuntimeError(f"Failed to connect to Redis: {e}")
+
+
     yield
-    # TODO: Add your shutdown logic here
     await redis_client.disconnect()
-    # For example, you might want to disconnect from a database
-    # db.disconnect()
-    # Or release some resources
-    # resource.release()
 
 app = FastAPI(lifespan=lifespan)
 
