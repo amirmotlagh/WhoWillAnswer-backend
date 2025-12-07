@@ -12,6 +12,14 @@ if not os.path.exists(ENV_FILE):
 
 class Settings(BaseSettings):
     DEBUG: bool = False
+    DB_HOST :str
+    DB_PORT : int
+    DB_USER : str
+    DB_PASSWORD :str
+    DB_NAME :str = "whowillanswer"
+    DB_POOL_SIZE :int
+    DB_MAX_OVERFLOW : int
+
     model_config = {
         "env_file": ENV_FILE
     }
