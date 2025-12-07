@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     DB_NAME :str = "whowillanswer"
     DB_POOL_SIZE :int
     DB_MAX_OVERFLOW : int
+    DB_ECHO : bool
 
     model_config = {
         "env_file": ENV_FILE
