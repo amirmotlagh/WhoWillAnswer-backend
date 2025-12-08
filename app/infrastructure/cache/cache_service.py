@@ -45,7 +45,7 @@ class CacheService:
             return False
     @staticmethod
     async def exists(key: str) -> bool:
-        client = redis_client.get_client()
+        client =await redis_client.get_client()
 
         try:
             return bool(await client.exists(key))
