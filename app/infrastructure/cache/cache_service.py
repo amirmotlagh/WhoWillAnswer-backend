@@ -35,7 +35,7 @@ class CacheService:
 
     @staticmethod
     async def delete(key: str) -> bool:
-        client = redis_client.get_client()
+        client =await redis_client.get_client()
 
         try:
             await client.delete(key)
