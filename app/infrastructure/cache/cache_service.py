@@ -19,7 +19,7 @@ class CacheService:
 
     @staticmethod
     async def get(key: str, serialize: bool = True):
-        client = redis_client.get_client()
+        client =await redis_client.get_client()
         try:
             data = await client.get(key)
             if data is None:
