@@ -4,7 +4,7 @@ import json
 class CacheService:
     @staticmethod
     async def set(key: str, value: str, expire: int | None = None, serialize: bool = True) -> bool:
-        client = redis_client.get_client()
+        client =await redis_client.get_client()
 
         try:
             if serialize:
