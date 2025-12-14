@@ -317,3 +317,13 @@ whowillanswer/
      │<── Game results ───────────────│              │
      │               │                │              │
 ```
+# Environments
+You can define different environments by adding file name format like below:
+- .env.development
+- .env.staging
+- .env.production
+
+Then set your environment:
+``` bash
+ENV=production uvicorn main:app --host 0.0.0.0 --port 8000
+```
