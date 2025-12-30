@@ -11,9 +11,12 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - NATS_URL=nats://nats:4222
     depends_on:
-      - postgres
-      - redis
-      - nats
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
     volumes:
       - .:/app
     restart: unless-stopped
@@ -31,6 +34,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-WhoWillAnswer}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Redis Cache
   redis:
@@ -41,6 +49,11 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # NATS Messaging
   nats:
@@ -50,6 +63,11 @@ services:
       - "4222:4222"
       - "8222:8222"  # Optional: NATS monitoring port
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
