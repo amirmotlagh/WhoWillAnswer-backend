@@ -1,5 +1,6 @@
 # Who Will Answer
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/amirmotlagh/WhoWillAnswer-backend?utm_source=oss&utm_medium=github&utm_campaign=amirmotlagh%2FWhoWillAnswer-backend&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 # Project Proposal Structure
 ```
@@ -327,3 +328,60 @@ Then set your environment:
 ``` bash
 ENV=production uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+This project integrates **Redis** for caching and managing game/room states asynchronously.
+
+## ⚙️ Setup
+
+### 1️⃣ Environment Variables
+Add these to your `.env` or `.env.example` file:
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+# Optional
+REDIS_PASSWORD=
+REDIS_DB=0
+```
+
+### 2️⃣ Run Redis (with Docker)
+If you don’t have Redis installed locally:
+```
+docker run -d --name redis -p 6379:6379 redis
+To verify it’s running:
+```
+```
+docker exec -it redis redis-cli ping
+# -> PONG
+```
+### 3️⃣ Using CacheService
+```python
+You can easily store and retrieve game or room states:
+from app.infrastructure.cache.cache_service import CacheService
+await CacheService.set("room:123:state", "active")
+state = await CacheService.get("room:123:state")
+print(state)  # -> active
+
+
+### 4️⃣ Health Check
+**File:**  
+```python
+File: app/v1/routes/health.py
+Function: is_redis_available()
+Verify Redis connectivity:
+Description:
+Performs a PING to the configured Redis host (settings.REDIS_HOST) to verify connectivity.
+Response:
+Returns HTTP 200 if Redis responds successfully.
+Returns HTTP 503 if Redis is unreachable or an error occurs.
+
+### 5️⃣ Key Naming Convention
+
+All Redis keys follow this format:
+`room:{room_id}:state`
+`game:{game_id}:state`
+
+✅ Summary
+Async Redis integration
+Connection pooling for efficiency
+Standardized key naming
+Built-in health check
+Supports both room and game caching
