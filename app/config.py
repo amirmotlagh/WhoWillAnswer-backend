@@ -10,6 +10,7 @@ ENV_FILE = f".env.{ENV}"
 if not os.path.exists(ENV_FILE):
     print(f"Warning: Environment file '{ENV_FILE}' does not exist.", file=sys.stderr)
 
+
 class Settings(BaseSettings):
     ####Redis######
     DEBUG: bool = False
@@ -22,4 +23,5 @@ class Settings(BaseSettings):
     model_config = {
         "env_file": ENV_FILE
     }
+
 settings = Settings()

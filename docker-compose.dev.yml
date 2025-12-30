@@ -1,0 +1,76 @@
+version: '3.3'
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+     context: .
+     dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://root:rootP@s3word@postgres:5432/WhoWillAnswer
+      - REDIS_URL=redis://redis:6379/0
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:18
+    container_name: WhoWillAnswer_postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-root}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rootP@s3word}
+      - POSTGRES_DB=${POSTGRES_DB:-WhoWillAnswer}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-WhoWillAnswer}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:8.4
+    container_name: WhoWillAnswer_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NATS Messaging
+  nats:
+    image: nats:2.12
+    container_name: WhoWillAnswer_nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"  # Optional: NATS monitoring port
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
