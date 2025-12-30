@@ -7,7 +7,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fastapi_db
+      - DATABASE_URL=postgresql://root:rootP@s3word@postgres:5432/WhoWillAnswer
       - REDIS_URL=redis://redis:6379/0
       - NATS_URL=nats://nats:4222
     depends_on:
