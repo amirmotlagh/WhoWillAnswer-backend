@@ -13,9 +13,12 @@ services:
       - REDIS_URL=redis://redis:6379/${REDIS_DB:-0}
       - NATS_URL=nats://nats:4222
     depends_on:
-      - postgres
-      - redis
-      - nats
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
     volumes:
       - .:/app
     restart: unless-stopped
