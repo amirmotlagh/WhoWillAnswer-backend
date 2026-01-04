@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from app.infrastructure.cache.redis_client import redis_client
 from fastapi import FastAPI
-
+import logging.config
+from app.logger.py import logging_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
