@@ -1,22 +1,20 @@
 from contextlib import asynccontextmanager
-
+from app.infrastructure.cache.redis_client import redis_client
 from fastapi import FastAPI
 import logging.config
 from app.logger.py import logging_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # TODO: Add your startup logic here
-    # For example, you might want to connect to a database
-    # db.connect()
-    # Or initialize some resources
-    # resource.initialize()
+    try:
+        await redis_client.connect()
+    except Exception as e:
+        ##TODO add logging
+        raise RuntimeError(f"Failed to connect to Redis: {e}")
+
+
     yield
-    # TODO: Add your shutdown logic here
-    # For example, you might want to disconnect from a database
-    # db.disconnect()
-    # Or release some resources
-    # resource.release()
+    await redis_client.disconnect()
 
 app = FastAPI(lifespan=lifespan)
 
