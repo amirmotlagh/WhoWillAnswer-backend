@@ -6,7 +6,7 @@ from app.logger import setup_logging, get_logger
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
-    logger = get_logger("uvicorn.error")
+    logger = get_logger("app")
     logger.info("Application startup: Logging configured")
     try:
         await redis_client.connect()
