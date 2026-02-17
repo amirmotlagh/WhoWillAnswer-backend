@@ -38,7 +38,7 @@ class RedisClient:
             await self._client.ping()
             return True
         except Exception as e:
-            logger.exception("Redis health check failed: %s", e)
+            logger.exception("Redis health check failed")
             return False
 
 
