@@ -1,6 +1,8 @@
+from app.logger import get_logger
 import redis.asyncio as redis
 from app.config import settings
 
+logger = get_logger("app.redis_client")
 
 class RedisClient:
 
@@ -9,6 +11,7 @@ class RedisClient:
         self._client = None
 
     async def connect(self):
+        logger.info(f"Connecting to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}")
         if not self._pool:
             self._pool = redis.ConnectionPool(
                 host=settings.REDIS_HOST,
@@ -17,7 +20,6 @@ class RedisClient:
                 max_connections=settings.REDIS_MAX_CONNECTIONS
             )
         self._client = redis.Redis(connection_pool=self._pool)
-        # TODO: add logging
 
     async def disconnect(self):
         if self._pool:

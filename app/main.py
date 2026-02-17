@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from app.infrastructure.cache.redis_client import redis_client
 from fastapi import FastAPI
 from app.logger import setup_logging, get_logger
+from app.api.v1.routes.health import health_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -10,6 +11,9 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup: Logging configured")
     try:
         await redis_client.connect()
+        redis_connected = await redis_client.health_check()
+        if not redis_connected:
+            raise RuntimeError("Failed to connect to Redis")
     except Exception as e:
         logger.exception(f"Failed to connect to Redis: {e}")
         raise RuntimeError(f"Failed to connect to Redis: {e}") from e
@@ -22,4 +26,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # app.include_router(...)  # Add your routers here
-# e.g., app.include_router(user_router)
+app.include_router(health_router)

@@ -13,15 +13,17 @@ LOGGING_CONFIG = {
     # ---------- FORMATTERS ----------
     "formatters": {
         "default": {
-            "format": "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+            "format": "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
         "access": {
-            "format": "%(asctime)s | ACCESS | %(client_addr)s | %(request_line)s | %(status_code)s",
+            "format": "%(asctime)s | ACCESS | %(levelname)s | %(name)s | %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
         "detailed": {
             "format": "%(asctime)s | %(levelname)s | %(name)s | "
                       "%(filename)s:%(lineno)d | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
 
