@@ -211,5 +211,4 @@ __marimo__/
 .idea
 
 # Logs
-*.log
 */logs/

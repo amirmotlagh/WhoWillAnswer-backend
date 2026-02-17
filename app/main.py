@@ -11,12 +11,13 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup: Logging configured")
     try:
         await redis_client.connect()
-        redis_connected = await redis_client.health_check()
-        if not redis_connected:
-            raise RuntimeError("Failed to connect to Redis")
     except Exception as e:
         logger.exception(f"Failed to connect to Redis: {e}")
         raise RuntimeError(f"Failed to connect to Redis: {e}") from e
+    
+    redis_connected = await redis_client.health_check()
+    if not redis_connected:
+        raise RuntimeError("Redis health check failed")
 
     logger.info("Application startup: App resources initialized")
     

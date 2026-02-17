@@ -12,6 +12,7 @@ services:
       - .env.${ENV:-development}
     environment:
       - ENV=${ENV:-development}
+      - REDIS_HOST=${REDIS_HOST:-redis}
       - DATABASE_URL=postgresql://root:rootP@s3word@postgres:5432/WhoWillAnswer
       - NATS_URL=nats://nats:4222
     depends_on:

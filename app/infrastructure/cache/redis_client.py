@@ -11,8 +11,8 @@ class RedisClient:
         self._client = None
 
     async def connect(self):
-        logger.info(f"Connecting to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}")
         if not self._pool:
+            logger.info(f"Connecting to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}")
             self._pool = redis.ConnectionPool(
                 host=settings.REDIS_HOST,
                 port=settings.REDIS_PORT,
@@ -26,7 +26,7 @@ class RedisClient:
             await self._pool.disconnect()
             self._pool = None
             self._client = None
-            # TODO: add logging
+            logger.info("Disconnected from Redis")
 
     async def get_client(self):
         if not self._client:
@@ -37,7 +37,8 @@ class RedisClient:
         try:
             await self._client.ping()
             return True
-        except Exception:
+        except Exception as e:
+            logger.exception("Redis health check failed: %s", e)
             return False
 
 
