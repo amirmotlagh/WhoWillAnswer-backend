@@ -100,10 +100,11 @@ def get_max_bytes() -> int:
     return int(os.getenv("LOG_MAX_BYTES", str(5 * 1024 * 1024)))
 
 def setup_logging() -> None:
-    LOG_DIR.mkdir(exist_ok=True)
     config = copy.deepcopy(LOGGING_CONFIG)
     config["handlers"]["console"]["level"] = get_log_level()
-    config["handlers"]["file"]["filename"] = get_log_file_path()
+    log_file = get_log_file_path()
+    Path(log_file).parent.mkdir(parents=True, exist_ok=True)
+    config["handlers"]["file"]["filename"] = log_file
     config["handlers"]["file"]["maxBytes"] = get_max_bytes()
     config["handlers"]["file"]["backupCount"] = get_backup_count()
 
