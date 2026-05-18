@@ -28,7 +28,7 @@ class Category(Base):
     # Relationship to questions
     questions = relationship("Question", back_populates="category", cascade="all, delete-orphan")
 
-class Questions(Base):
+class Question(Base):
     __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True, index=True)
