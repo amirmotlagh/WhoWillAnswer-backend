@@ -75,14 +75,7 @@ whowillanswer/
 │   │   │   ├── __init__.py
 │   │   │   ├── base.py              # SQLAlchemy Base
 │   │   │   ├── session.py           # Database session management
-│   │   │   ├── models/              # SQLAlchemy ORM models
-│   │   │   │   ├── __init__.py
-│   │   │   │   ├── user.py
-│   │   │   │   ├── room.py
-│   │   │   │   ├── game.py
-│   │   │   │   ├── question.py
-│   │   │   │   ├── game_player.py   # Game participants
-│   │   │   │   └── game_answer.py   # Player answers log
+│   │   │   ├── models.py            # SQLAlchemy ORM models
 │   │   │   └── repositories/        # Data access layer (Repository pattern)
 │   │   │       ├── __init__.py
 │   │   │       ├── base.py          # Generic repository
