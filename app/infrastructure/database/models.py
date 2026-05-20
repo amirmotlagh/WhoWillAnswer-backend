@@ -46,7 +46,7 @@ class Answer(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text, nullable=False)
-    is_correct = Column(Integer, default=0)  # 0 for false, 1 for true
+    is_correct = Column(Boolean, nullable=False, default=False)
     question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

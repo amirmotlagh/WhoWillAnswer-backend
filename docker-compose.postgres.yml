@@ -3,27 +3,27 @@ version: '3.3'
 services:
   # PostgreSQL Database
     postgres:
-    image: postgres:18
-    container_name: WhoWillAnswer_postgres
-    env_file:
-      - .env.${ENV:-development}
-    environment:
-      - POSTGRES_USER=${DATABASE_USERNAME:-root}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME:-wwa_db}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql
-      - /scripts/init_db.sh:/docker-entrypoint-initdb.d/init.sh:ro
-    command: [ "postgres", "-c", "log_statement=none", "-c", "log_min_duration_statement=1000", "-c", "log_connections=on", "-c", "log_disconnections=on" ]
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-root} -d ${DATABASE_NAME:-wwa_db}"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+      image: postgres:18
+      container_name: WhoWillAnswer_postgres
+      env_file:
+        - .env.${ENV:-development}
+      environment:
+        - POSTGRES_USER=${DATABASE_USERNAME:-root}
+        - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+        - POSTGRES_DB=${DATABASE_NAME:-wwa_db}
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql
+        - ./scripts/init_db.sh:/docker-entrypoint-initdb.d/init.sh:ro
+      command: [ "postgres", "-c", "log_statement=none", "-c", "log_min_duration_statement=1000", "-c", "log_connections=on", "-c", "log_disconnections=on" ]
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-root} -d ${DATABASE_NAME:-wwa_db}"]
+        interval: 30s
+        timeout: 5s
+        retries: 5
+        start_period: 10s
 
 volumes:
   postgres_data:

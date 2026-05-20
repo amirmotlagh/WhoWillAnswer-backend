@@ -2,15 +2,17 @@ from app.config import settings
 from app.logger import get_logger
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.pool import NullPool, QueuePool
+from sqlalchemy.pool import NullPool, StaticPool, AsyncAdaptedQueuePool
 
 logger = get_logger("app.database.base")
 
 def get_pool_class(pool_class_name: str):
     if pool_class_name == "NullPool":
         return NullPool
-    if pool_class_name == "QueuePool":
-        return QueuePool
+    if pool_class_name == "StaticPool":
+        return StaticPool
+    if pool_class_name == "AsyncAdaptedQueuePool":
+        return AsyncAdaptedQueuePool
     raise ValueError(f"Unsupported pool class: {pool_class_name}")
 
 # Load environment variables
@@ -22,9 +24,9 @@ if not DATABASE_URL:
 engine = create_async_engine(
     DATABASE_URL,
     echo=settings.DEBUG,
-    # pool_size=settings.DB_POOL_SIZE,
-    # max_overflow=settings.DB_MAX_OVERFLOW,
-    # pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_size=settings.DB_POOL_SIZE,
+    max_overflow=settings.DB_MAX_OVERFLOW,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
     poolclass=get_pool_class(settings.DB_POOL_CLASS),
     # Performance optimizations
     # pool_pre_ping=True,  # Validate connections

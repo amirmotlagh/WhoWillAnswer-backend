@@ -12,10 +12,6 @@ services:
       - .env.${ENV:-development}
     environment:
       - ENV=${ENV:-development}
-    # environment:
-      # - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastapi_db}
-      # - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      # - NATS_URL=nats://nats:4222
     depends_on:
       postgres:
         condition: service_healthy
