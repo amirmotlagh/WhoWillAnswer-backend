@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "20"))
     DB_POOL_TIMEOUT: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
 
+    MAX_MIGRATION_RETRIES: int = int(os.getenv("MAX_MIGRATION_RETRIES", "5"))
+    INITIAL_DELAY: int = int(os.getenv("INITIAL_DELAY", "3"))
+    MAX_DELAY: int = int(os.getenv("MAX_DELAY", "20"))
 
 
     model_config = {
