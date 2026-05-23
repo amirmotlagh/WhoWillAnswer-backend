@@ -12,38 +12,24 @@ services:
       - .env.${ENV:-development}
     environment:
       - ENV=${ENV:-development}
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - DATABASE_URL=postgresql://root:rootP@s3word@postgres:5432/WhoWillAnswer
-      - NATS_URL=nats://nats:4222
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      nats:
-        condition: service_healthy
+    #   nats:
+    #     condition: service_healthy
     volumes:
       - .:/app
     restart: unless-stopped
-
-  # PostgreSQL Database
-  postgres:
-    image: postgres:18
-    container_name: WhoWillAnswer_postgres
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-root}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-rootP@s3word}
-      - POSTGRES_DB=${POSTGRES_DB:-WhoWillAnswer}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-WhoWillAnswer}" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
+      start_period: 40s
+    networks:
+      - project_network
 
   # Redis Cache
   redis:
@@ -59,20 +45,38 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - project_network
 
-  # NATS Messaging
-  nats:
-    image: nats:2.12
-    container_name: WhoWillAnswer_nats
+  postgres:
+    image: postgres:18
+    container_name: WhoWillAnswer_postgres
+    env_file:
+      - .env.${ENV:-development}
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME:-root}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME:-wwa_db}
     ports:
-      - "4222:4222"
-      - "8222:8222"  # Optional: NATS monitoring port
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./scripts/init_db.sh:/docker-entrypoint-initdb.d/init.sh:ro
+      # - /app/infrastructure/postgres/postgres.conf:/etc/postgresql/postgresql.conf:ro    
+    command: [ "postgres", "-c", "log_statement=none", "-c", "log_min_duration_statement=1000", "-c", "log_connections=on", "-c", "log_disconnections=on" ]
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz" ]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-root} -d ${DATABASE_NAME:-wwa_db}"]
+      interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    networks:
+      - project_network
+
+networks:
+  project_network:
+    driver: bridge
 
 volumes:
   postgres_data:

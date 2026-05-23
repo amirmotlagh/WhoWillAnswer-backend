@@ -11,7 +11,9 @@ __pycache__/
 .gitignore
 .dockerignore
 docker-compose*.yml
+docker-compose*
 Dockerfile*
+Dockerfile
 *.md
 .pytest_cache/
 .coverage
