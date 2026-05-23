@@ -37,7 +37,7 @@ def upgrade() -> None:
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ondelete="CASCADE"),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_questions_id'), 'questions', ['id'], unique=False)
@@ -48,7 +48,7 @@ def upgrade() -> None:
     sa.Column('question_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ),
+    sa.ForeignKeyConstraint(['question_id'], ['questions.id'], ondelete="CASCADE"),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_answers_id'), 'answers', ['id'], unique=False)
