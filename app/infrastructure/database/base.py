@@ -37,7 +37,7 @@ engine = create_async_engine(
     **engine_kwargs,
     # Performance optimizations
     pool_pre_ping=True,  # Validate connections
-    pool_reset_on_return="commit",  # Reset connections
+    pool_reset_on_return="rollback",  # Reset connections safely
 
     # Connection arguments
     connect_args={
