@@ -6,6 +6,7 @@ from app.logger import setup_logging, get_logger
 from app.api.v1.routes.health import health_router
 import asyncio
 from sqlalchemy import text
+from app.infrastructure.messaging.nats_client import NATSClientManager
 
 async def wait_for_db(retries=5, delay=2):
     for i in range(retries):
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup: Logging configured")
     try:
         await redis_client.connect()
+        logger.info("Redis connection is Ready.")
     except Exception as e:
         logger.exception("Failed to connect to Redis")
         raise RuntimeError("Failed to connect to Redis") from e
@@ -35,6 +37,12 @@ async def lifespan(app: FastAPI):
 
     # Verify DB connection and basic health
     await wait_for_db()
+
+    nats_manager = NATSClientManager()
+    await nats_manager.connect()
+    logger.info("NATS JetStream Ready.")
+
+    app.state.nats = nats_manager
     logger.info("Application startup: App resources initialized")
     
     yield

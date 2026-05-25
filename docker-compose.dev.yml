@@ -77,6 +77,8 @@ services:
   nats:
     image: nats:2.14-alpine3.22
     container_name: WhoWillAnswer_nats
+    env_file:
+      - .env.${ENV:-development}
     ports:
       - "4222:4222"
       - "8222:8222"
