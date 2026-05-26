@@ -24,6 +24,7 @@ async def is_redis_available():
 async def is_nats_available(request: Request):
     try:
         state = await request.app.state.nats.health_check()
-        return JSONResponse(status_code=200, content=state)
+        status_code = 200 if state.get("status") == "connected" else 503
+        return JSONResponse(status_code=status_code, content=state)
     except Exception:
         return JSONResponse(status_code=503, content={"status": "error"})

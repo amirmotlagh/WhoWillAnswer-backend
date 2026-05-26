@@ -4,10 +4,10 @@ import uuid
 from datetime import datetime
 from typing import Any
 
+from nats.aio.client import Client as NATSClient
 from nats.js import JetStreamContext
 from nats.js.errors import NoStreamResponseError
 from app.logger import get_logger
-
 
 logger = get_logger("app.messaging.publisher")
 
@@ -15,8 +15,9 @@ _DEFAULT_TIMEOUT = 5.0 # seconds
 
 class EventPublisher:
 
-    def __init__(self, js: JetStreamContext) -> None:
+    def __init__(self, js: JetStreamContext, nc: NATSClient) -> None:
         self._js = js
+        self._nc = nc
 
     @staticmethod
     def _build_envelope(subject: str, payload: dict[str, Any], event_id: str) -> dict[str, Any]:
@@ -69,5 +70,5 @@ class EventPublisher:
         
         data = json.dumps(payload).encode()
 
-        response = await self._js._nc.request(subject=subject, payload=data, timeout=timeout)
+        response = await self._nc.request(subject=subject, payload=data, timeout=timeout)
         return json.loads(response.data.decode())

@@ -35,13 +35,13 @@ async def wait_for_redis(logger: logging.Logger):
     if not redis_connected:
         raise RuntimeError("Redis health check failed")
 
-async def wait_for_nats(logger: logging.Logger) -> NATSClientManager:
+async def wait_for_nats(app: FastAPI, logger: logging.Logger) -> NATSClientManager:
     try:
         nats_manager = NATSClientManager()
         await nats_manager.connect()
         logger.info("NATS JetStream Ready.")
         app.state.nats = nats_manager
-        app.state.publisher = EventPublisher(js=nats_manager.jetstream)
+        app.state.publisher = EventPublisher(js=nats_manager.jetstream, nc=nats_manager.client)
         app.state.subscriber = EventSubscriber(js=nats_manager.jetstream)
         return nats_manager
     except Exception as e:
@@ -56,7 +56,7 @@ async def lifespan(app: FastAPI):
     
     await wait_for_db()
     await wait_for_redis(logger=logger)
-    nats_manager = await wait_for_nats(logger=logger)
+    nats_manager = await wait_for_nats(app=app, logger=logger)
     
     logger.info("Application startup: App resources initialized")
     
