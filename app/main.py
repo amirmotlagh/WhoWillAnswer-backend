@@ -40,6 +40,9 @@ async def wait_for_nats(app: FastAPI, logger: logging.Logger) -> NATSClientManag
         nats_manager = NATSClientManager()
         await nats_manager.connect()
         logger.info("NATS JetStream Ready.")
+        nats_state = await nats_manager.health_check()
+        if nats_state.get("status") != "connected":
+            raise RuntimeError("NATS health check failed")
         app.state.nats = nats_manager
         app.state.publisher = EventPublisher(js=nats_manager.jetstream, nc=nats_manager.client)
         app.state.subscriber = EventSubscriber(js=nats_manager.jetstream)
