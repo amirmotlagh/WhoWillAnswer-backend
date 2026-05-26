@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     INITIAL_DELAY: int = int(os.getenv("INITIAL_DELAY", "3"))
     MAX_DELAY: int = int(os.getenv("MAX_DELAY", "20"))
 
+    #NATS
+    NATS_URL: str = os.getenv("NATS_URL", "nats://nats:4222")
+    NATS_TOKEN: str | None = os.getenv("NATS_TOKEN")
 
     model_config = {
         "env_file": ENV_FILE

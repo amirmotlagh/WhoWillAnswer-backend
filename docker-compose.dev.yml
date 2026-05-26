@@ -17,8 +17,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    #   nats:
-    #     condition: service_healthy
+      nats:
+        condition: service_healthy
     volumes:
       - .:/app
     restart: unless-stopped
@@ -73,7 +73,28 @@ services:
       start_period: 10s
     networks:
       - project_network
-
+    
+  nats:
+    image: nats:2.14-alpine3.22
+    container_name: WhoWillAnswer_nats
+    env_file:
+      - .env.${ENV:-development}
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    restart: unless-stopped
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf:ro
+      - nats-data:/data
+    command: ["-c", "/etc/nats/nats.conf"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8222/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - project_network
+  
 networks:
   project_network:
     driver: bridge
@@ -81,3 +102,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  nats-data:

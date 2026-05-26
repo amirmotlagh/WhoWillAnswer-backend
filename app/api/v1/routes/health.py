@@ -1,6 +1,6 @@
 from starlette.responses import JSONResponse
 from app.infrastructure.cache.redis_client import redis_client
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 health_router = APIRouter(prefix="/health", tags=["health"])
 
@@ -20,6 +20,11 @@ async def is_redis_available():
         ##TODO add logging
         return JSONResponse(status_code=503, content={"status": "error"})
 
-
-
-
+@health_router.get("/nats/", summary="Check Nats health")
+async def is_nats_available(request: Request):
+    try:
+        state = await request.app.state.nats.health_check()
+        status_code = 200 if state.get("status") == "connected" else 503
+        return JSONResponse(status_code=status_code, content=state)
+    except Exception:
+        return JSONResponse(status_code=503, content={"status": "error"})
