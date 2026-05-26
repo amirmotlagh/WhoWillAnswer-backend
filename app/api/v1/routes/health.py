@@ -19,7 +19,3 @@ async def is_redis_available():
     except Exception:
         ##TODO add logging
         return JSONResponse(status_code=503, content={"status": "error"})
-
-
-
-

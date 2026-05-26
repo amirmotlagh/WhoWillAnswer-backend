@@ -48,7 +48,7 @@ class Settings(BaseSettings):
 
     #NATS
     NATS_URL: str = os.getenv("NATS_URL", "nats://nats:4222")
-    NATS_TOKEN: str = os.getenv("NATS_TOKEN", "dfji348934jdd0i24uhjd29834ijrr0345jo0r3j034n")
+    NATS_TOKEN: str | None = os.getenv("NATS_TOKEN")
 
     model_config = {
         "env_file": ENV_FILE

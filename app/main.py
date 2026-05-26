@@ -1,7 +1,11 @@
 from contextlib import asynccontextmanager
+import logging
+
 from app.infrastructure.cache.redis_client import redis_client
 from app.infrastructure.database.session import engine
 from fastapi import FastAPI
+from app.infrastructure.messaging.publisher import EventPublisher
+from app.infrastructure.messaging.subscriber import EventSubscriber
 from app.logger import setup_logging, get_logger
 from app.api.v1.routes.health import health_router
 import asyncio
@@ -19,11 +23,7 @@ async def wait_for_db(retries=5, delay=2):
                 raise
             await asyncio.sleep(delay)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    setup_logging()
-    logger = get_logger("app")
-    logger.info("Application startup: Logging configured")
+async def wait_for_redis(logger: logging.Logger):
     try:
         await redis_client.connect()
         logger.info("Redis connection is Ready.")
@@ -35,18 +35,42 @@ async def lifespan(app: FastAPI):
     if not redis_connected:
         raise RuntimeError("Redis health check failed")
 
-    # Verify DB connection and basic health
+async def wait_for_nats(logger: logging.Logger) -> NATSClientManager:
+    try:
+        nats_manager = NATSClientManager()
+        await nats_manager.connect()
+        logger.info("NATS JetStream Ready.")
+        app.state.nats = nats_manager
+        app.state.publisher = EventPublisher(js=nats_manager.jetstream)
+        app.state.subscriber = EventSubscriber(js=nats_manager.jetstream)
+        return nats_manager
+    except Exception as e:
+        logger.exception("Failed to connect to NATS")
+        raise RuntimeError("Failed to connect to NATS") from e
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_logging()
+    logger = get_logger("app")
+    logger.info("Application startup: Logging configured")
+    
     await wait_for_db()
-
-    nats_manager = NATSClientManager()
-    await nats_manager.connect()
-    logger.info("NATS JetStream Ready.")
-
-    app.state.nats = nats_manager
+    await wait_for_redis(logger=logger)
+    nats_manager = await wait_for_nats(logger=logger)
+    
     logger.info("Application startup: App resources initialized")
     
     yield
+    logger.info("shutting down...")
+
+    await app.state.subscriber.unsubscribe_all()
+
+    await nats_manager.drain()
+    await nats_manager.close()
+    logger.info("NATS disconnected.")
+
     await redis_client.disconnect()
+    logger.info("Redis disconnected.")
 
 app = FastAPI(lifespan=lifespan)
 
