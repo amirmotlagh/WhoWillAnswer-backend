@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
 import logging
 
+from app.core.events.subscriptions import register_subscribers
 from app.infrastructure.cache.redis_client import redis_client
 from app.infrastructure.database.session import engine
 from fastapi import FastAPI
+from app.infrastructure.messaging import subjects
 from app.infrastructure.messaging.publisher import EventPublisher
 from app.infrastructure.messaging.subscriber import EventSubscriber
 from app.logger import setup_logging, get_logger
@@ -45,7 +47,7 @@ async def wait_for_nats(app: FastAPI, logger: logging.Logger) -> NATSClientManag
             raise RuntimeError("NATS health check failed")
         app.state.nats = nats_manager
         app.state.publisher = EventPublisher(js=nats_manager.jetstream, nc=nats_manager.client)
-        app.state.subscriber = EventSubscriber(js=nats_manager.jetstream)
+        app.state.subscriber = EventSubscriber(nc=nats_manager.client ,js=nats_manager.jetstream)
         return nats_manager
     except Exception as e:
         logger.exception("Failed to connect to NATS")
@@ -60,6 +62,9 @@ async def lifespan(app: FastAPI):
     await wait_for_db()
     await wait_for_redis(logger=logger)
     nats_manager = await wait_for_nats(app=app, logger=logger)
+    
+    await register_subscribers(app)
+    logger.info("Event subscribers registered.")
     
     logger.info("Application startup: App resources initialized")
     
