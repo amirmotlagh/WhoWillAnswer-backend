@@ -53,8 +53,9 @@ class EventSubscriber:
                 if queue and existing.config.deliver_group != queue:
                     await self._js.delete_consumer(stream, durable)
                     await self._js.add_consumer(stream, config)
-                if existing.config.deliver_subject:
-                    deliver_subject = existing.config.deliver_subject
+                else:
+                    if existing.config.deliver_subject:
+                        deliver_subject = existing.config.deliver_subject
             except NotFoundError:
                 await self._js.add_consumer(stream, config)
 

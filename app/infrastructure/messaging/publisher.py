@@ -1,10 +1,11 @@
 import json
 import uuid
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from nats.aio.client import Client as NATSClient
+from nats.errors import TimeoutError as NatsTimeoutError
 from nats.js import JetStreamContext
 from nats.js.errors import NoStreamResponseError
 from app.logger import get_logger
@@ -24,7 +25,7 @@ class EventPublisher:
         return {
             "event_id": event_id,
             "subject": subject,
-            "timestamp":datetime.now().isoformat(),
+            "timestamp":datetime.now(timezone.utc).isoformat(),
             "payload": payload
         }
 
@@ -70,5 +71,22 @@ class EventPublisher:
         
         data = json.dumps(payload).encode()
 
-        response = await self._nc.request(subject=subject, payload=data, timeout=timeout)
-        return json.loads(response.data.decode())
+        try:
+            response = await self._nc.request(subject=subject, payload=data, timeout=timeout)
+            return json.loads(response.data.decode())
+        except NatsTimeoutError:
+            logger.error(
+                "Request to '%s' timed out after %s seconds. Payload: %s",
+                subject, timeout, payload,
+            )
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(
+                "Failed to decode JSON response from '%s': %s", subject, e
+            )
+        except Exception as e:
+            logger.error(
+                "Error during request to '%s': %s", subject, e
+            )
+            raise
+        return {}
