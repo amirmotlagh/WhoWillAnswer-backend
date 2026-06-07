@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     DATABASE_NAME: str = "wwa_db"
     DATABASE_DBAPI: str = "postgresql+asyncpg"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Override DATABASE_URL with the computed property
+        if not self.DEBUG and (
+            self.DATABASE_USERNAME == "username" or self.DATABASE_PASSWORD == "password"
+        ):
+            raise ValueError("DATABASE_USERNAME and DATABASE_PASSWORD must be set in production")
+
     @property
     def DATABASE_URL(self) -> str:
         return (
@@ -37,15 +45,17 @@ class Settings(BaseSettings):
             f"{self.DATABASE_PORT}/{self.DATABASE_NAME}"
         )
 
-    DB_POOL_CLASS: str = "NullPool"
+    # Default is AsyncAdaptedQueuePool for connection pooling. Override via env var if another strategy is needed.
+    DB_POOL_CLASS: str = "AsyncAdaptedQueuePool"
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
     DB_POOL_TIMEOUT: int = 30
 
     MAX_MIGRATION_RETRIES: int = 5
-    INITIAL_DELAY: int = 3
-    MAX_DELAY: int = 20
-    MIGRATE: bool = False
+    MIGRATION_INITIAL_DELAY: int = 3
+    MIGRATION_MAX_DELAY: int = 30
+    MIGRATE: bool = True
+    DB_READY_TIMEOUT: int = 60
 
     #NATS
     NATS_URL: str = "nats://nats:4222"

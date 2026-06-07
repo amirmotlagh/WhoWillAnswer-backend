@@ -1,13 +1,27 @@
 #!/bin/bash
 set -e
 
-if [[ "$MIGRATE" != "true" ]] ; then
-  echo "MIGRATE is not set to 'true', skipping migrations"
+if [[ "$MIGRATE" != "True" ]] ; then
+  echo "MIGRATE is not set to 'True', skipping migrations"
   exec "$@"
 fi
 
+DB_READY_TIMEOUT=${DB_READY_TIMEOUT:-60}
+start_time=$(date +%s)
+PYTHON_CMD=$(command -v python3 || command -v python)
+
+if [ -z "$PYTHON_CMD" ]; then
+  echo "ERROR: python or python3 is required for the readiness check"
+  exit 1
+fi
+
 echo "Waiting for PostgreSQL..."
-until python -c "import socket; s = socket.socket(); s.settimeout(2); s.connect(('${DATABASE_HOST:-postgres}', ${DATABASE_PORT:-5432}))" 2>/dev/null; do
+until $PYTHON_CMD -c "import socket; s = socket.socket(); s.settimeout(2); s.connect(('${DATABASE_HOST:-postgres}', ${DATABASE_PORT:-5432}))" 2>/dev/null; do
+  current_time=$(date +%s)
+  if [ $((current_time - start_time)) -ge "$DB_READY_TIMEOUT" ]; then
+    echo "ERROR: Timed out waiting for PostgreSQL after $DB_READY_TIMEOUT seconds"
+    exit 1
+  fi
   echo "PostgreSQL is unavailable - sleeping"
   sleep 2
 done
@@ -17,7 +31,7 @@ echo "Running Alembic migrations..."
 
 # Configuration
 MAX_MIGRATION_RETRIES=${MAX_MIGRATION_RETRIES:-5}
-INITIAL_DELAY=${MIGRATION_INITIAL_DELAY:-2}
+INITIAL_DELAY=${MIGRATION_INITIAL_DELAY:-3}
 MAX_DELAY=${MIGRATION_MAX_DELAY:-30}
 
 if ! [[ "$MAX_MIGRATION_RETRIES" =~ ^[1-9][0-9]*$ ]]; then
