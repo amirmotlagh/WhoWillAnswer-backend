@@ -1,12 +1,17 @@
 #!/bin/bash
 set -e
 
-# echo "Waiting for PostgreSQL..."
-# until nc -z postgres 5432; do
-#   echo "PostgreSQL is unavailable - sleeping"
-#   sleep 2
-# done
-# echo "PostgreSQL is ready"
+if [[ "$MIGRATE" != "true" ]] ; then
+  echo "MIGRATE is not set to 'true', skipping migrations"
+  exec "$@"
+fi
+
+echo "Waiting for PostgreSQL..."
+until python -c "import socket; s = socket.socket(); s.settimeout(2); s.connect(('${DATABASE_HOST:-postgres}', ${DATABASE_PORT:-5432}))" 2>/dev/null; do
+  echo "PostgreSQL is unavailable - sleeping"
+  sleep 2
+done
+echo "PostgreSQL is ready"
 
 echo "Running Alembic migrations..."
 

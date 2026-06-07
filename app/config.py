@@ -22,12 +22,12 @@ class Settings(BaseSettings):
     REDIS_URL: str = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 
     ####Database######
-    DATABASE_USERNAME: str = os.getenv("DATABASE_USERNAME", "username")
-    DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "password")
-    DATABASE_HOST: str = os.getenv("DATABASE_HOST", "localhost")
-    DATABASE_PORT: int = int(os.getenv("DATABASE_PORT", "5432"))
-    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "wwa_db")
-    DATABASE_DBAPI: str = os.getenv("DATABASE_DBAPI", "postgresql+asyncpg")
+    DATABASE_USERNAME: str = "username"
+    DATABASE_PASSWORD: str = "password"
+    DATABASE_HOST: str = "localhost"
+    DATABASE_PORT: int = 5432
+    DATABASE_NAME: str = "wwa_db"
+    DATABASE_DBAPI: str = "postgresql+asyncpg"
 
     @property
     def DATABASE_URL(self) -> str:
@@ -37,18 +37,19 @@ class Settings(BaseSettings):
             f"{self.DATABASE_PORT}/{self.DATABASE_NAME}"
         )
 
-    DB_POOL_CLASS: str = os.getenv("DB_POOL_CLASS", "NullPool")
-    DB_POOL_SIZE: int = int(os.getenv("DB_POOL_SIZE", "10"))
-    DB_MAX_OVERFLOW: int = int(os.getenv("DB_MAX_OVERFLOW", "20"))
-    DB_POOL_TIMEOUT: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
+    DB_POOL_CLASS: str = "NullPool"
+    DB_POOL_SIZE: int = 10
+    DB_MAX_OVERFLOW: int = 20
+    DB_POOL_TIMEOUT: int = 30
 
-    MAX_MIGRATION_RETRIES: int = int(os.getenv("MAX_MIGRATION_RETRIES", "5"))
-    INITIAL_DELAY: int = int(os.getenv("INITIAL_DELAY", "3"))
-    MAX_DELAY: int = int(os.getenv("MAX_DELAY", "20"))
+    MAX_MIGRATION_RETRIES: int = 5
+    INITIAL_DELAY: int = 3
+    MAX_DELAY: int = 20
+    MIGRATE: bool = False
 
     #NATS
-    NATS_URL: str = os.getenv("NATS_URL", "nats://nats:4222")
-    NATS_TOKEN: str | None = os.getenv("NATS_TOKEN")
+    NATS_URL: str = "nats://nats:4222"
+    NATS_TOKEN: str | None = None
 
     model_config = {
         "env_file": ENV_FILE
