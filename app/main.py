@@ -80,6 +80,9 @@ async def lifespan(app: FastAPI):
     await redis_client.disconnect()
     logger.info("Redis disconnected.")
 
+    await engine.dispose()
+    logger.info("Database disconnected.")
+
 app = FastAPI(lifespan=lifespan)
 
 # app.include_router(...)  # Add your routers here
