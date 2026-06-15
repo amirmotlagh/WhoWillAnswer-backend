@@ -5,11 +5,14 @@ from app.core.events.subscriptions import register_subscribers
 from app.infrastructure.cache.redis_client import redis_client
 from app.infrastructure.database.session import engine
 from fastapi import FastAPI
-from app.infrastructure.messaging import subjects
 from app.infrastructure.messaging.publisher import EventPublisher
 from app.infrastructure.messaging.subscriber import EventSubscriber
 from app.logger import setup_logging, get_logger
 from app.api.v1.routes.health import health_router
+from app.api.v1.websockets.game import game_ws_router
+from app.api.v1.routes.games import game_router
+from app.api.v1.routes.user import user_router
+
 import asyncio
 from sqlalchemy import text
 from app.infrastructure.messaging.nats_client import NATSClientManager
@@ -87,3 +90,6 @@ app = FastAPI(lifespan=lifespan)
 
 # app.include_router(...)  # Add your routers here
 app.include_router(health_router)
+app.include_router(game_ws_router)
+app.include_router(game_router)
+app.include_router(user_router)

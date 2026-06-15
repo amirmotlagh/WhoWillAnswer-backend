@@ -1,10 +1,14 @@
+from typing import Any
+
 from app.infrastructure.cache.redis_client import redis_client
 import json
 
 class CacheService:
     @staticmethod
-    async def set(key: str, value: str, expire: int | None = None, serialize: bool = True) -> bool:
+    async def set(key: str, value: Any, expire: int | None = None, serialize: bool = True) -> bool:
         client =await redis_client.get_client()
+        if not client:
+            return False
 
         try:
             if serialize:
@@ -15,11 +19,12 @@ class CacheService:
             # TODO add logging
             return False
 
-
-
     @staticmethod
     async def get(key: str, serialize: bool = True):
         client =await redis_client.get_client()
+        if not client:
+            return None
+
         try:
             data = await client.get(key)
             if data is None:
@@ -36,6 +41,8 @@ class CacheService:
     @staticmethod
     async def delete(key: str) -> bool:
         client =await redis_client.get_client()
+        if not client:
+            return False
 
         try:
             await client.delete(key)
@@ -43,9 +50,12 @@ class CacheService:
         except Exception:
             # TODO add logging
             return False
+
     @staticmethod
     async def exists(key: str) -> bool:
         client =await redis_client.get_client()
+        if not client:
+            return False
 
         try:
             return bool(await client.exists(key))

@@ -1,55 +1,103 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, DateTime
-from sqlalchemy.orm import relationship
+import enum
+import datetime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
 
+class GameState(str, enum.Enum):
+    WAITING = "waiting"
+    ACTIVE = "active"
+    FINISHED = "finished"
+
+game_players = Table(
+    "game_players",
+    Base.metadata,
+    Column("game_id", Integer, ForeignKey("games.id", ondelete="CASCADE"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+)
+
+game_questions = Table(
+    "game_questions",
+    Base.metadata,
+    Column("game_id", Integer, ForeignKey("games.id", ondelete="CASCADE"), primary_key=True),
+    Column("question_id", Integer, ForeignKey("questions.id", ondelete="CASCADE"), primary_key=True)
+)
+
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    phone_number = Column(String(16), unique=True, index=True, nullable=True)
-    username = Column(String(100), unique=True, index=True, nullable=False)
-    full_name = Column(String(255), nullable=True)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    phone_number: Mapped[str | None] = mapped_column(String(16), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    full_name: Mapped[str | None] = mapped_column(String(255))
+    is_active: Mapped[bool] = mapped_column(default=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    games: Mapped[list["Game"]] = relationship(secondary=game_players, back_populates="players")
 
 class Category(Base):
     __tablename__ = "categories"
     
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), unique=True, nullable=False)
-    description = Column(Text, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True)
+    description: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationship to questions
-    questions = relationship("Question", back_populates="category", cascade="all, delete-orphan")
+    questions: Mapped[list["Question"]] = relationship(back_populates="category", cascade="all, delete-orphan")
 
 class Question(Base):
     __tablename__ = "questions"
 
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(String(255), nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    text: Mapped[str] = mapped_column(String(255))
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationships
-    category = relationship("Category", back_populates="questions")
-    answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
+    category: Mapped["Category"] = relationship(back_populates="questions")
+    answers: Mapped[list["Answer"]] = relationship(back_populates="question", cascade="all, delete-orphan")
+    games: Mapped[list["Game"]] = relationship(secondary=game_questions, back_populates="questions")
 
 class Answer(Base):
     __tablename__ = "answers"
     
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(Text, nullable=False)
-    is_correct = Column(Boolean, nullable=False, default=False)
-    question_id = Column(Integer, ForeignKey("questions.id"), nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    text: Mapped[str] = mapped_column(Text)
+    is_correct: Mapped[bool] = mapped_column(default=False)
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
     # Relationship to question
-    question = relationship("Question", back_populates="answers")
+    question: Mapped["Question"] = relationship(back_populates="answers")
+
+
+class Game(Base):
+    __tablename__ = "games"
+    
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    min_players: Mapped[int]
+    max_players: Mapped[int]
+    max_timeout: Mapped[int]  # in seconds
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    started_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True))
+    ended_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    private: Mapped[bool] = mapped_column(default=False)
+    password: Mapped[str | None] = mapped_column(String(100))
+    winner: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    state: Mapped[GameState] = mapped_column(Enum(GameState, native_enum=False, length=50), default=GameState.WAITING)
+    # Relationships
+    category: Mapped["Category"] = relationship()
+    players: Mapped[list["User"]] = relationship(secondary=game_players, back_populates="games")
+    questions: Mapped[list["Question"]] = relationship(secondary=game_questions, back_populates="games")

@@ -8,3 +8,8 @@ class KeyBuilder:
     @classmethod
     def game_state_key(cls, game_id: str):
         return f"{cls.GAME}:{game_id}:state"
+    
+    @classmethod
+    def game_players_key(cls, game_id: str):
+        return f"{cls.GAME}:{game_id}:players"
+
