@@ -18,4 +18,4 @@ async def create_user(user_data: UserCreate, session=Depends(get_database_sessio
     user_repo = UserRepository(session)
     user = await user_service.create_user(user_data, user_repo)
     
-    return {"message": "User created successfully", "user": user}
+    return {"message": "User created successfully", "payload": user}

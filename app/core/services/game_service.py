@@ -11,7 +11,7 @@ from app.schemas.game import GameCreate, GameResponse
 from app.schemas.user import UserInfoForGame
 
 
-async def initiate_new_game(creator_id: int, game_data: GameCreate, user_repo: UserRepository, game_repo: GameRepository, publisher: EventPublisher) -> None:
+async def initiate_new_game(creator_id: int, game_data: GameCreate, user_repo: UserRepository, game_repo: GameRepository, publisher: EventPublisher) -> GameResponse:
     user = await user_repo.get_user_by_id(creator_id)
     if not user or not user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Creator user not found")
@@ -43,3 +43,5 @@ async def initiate_new_game(creator_id: int, game_data: GameCreate, user_repo: U
     game_dict = jsonable_encoder(game_response)
     event_id = str(uuid.uuid5(uuid.NAMESPACE_OID, f"match_created_{game.id}"))
     await publisher.publish(subject=Subjects.MATCH_CREATED, payload={"game_data": game_dict}, event_id=event_id)
+    return game_response
+    

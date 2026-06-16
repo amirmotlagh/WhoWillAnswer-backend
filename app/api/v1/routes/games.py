@@ -15,10 +15,10 @@ logger = get_logger(__name__)
 
 game_router = APIRouter(prefix="/game", tags=["game"])
 
-@game_router.post("/initiate/{creator_id}", summary="Initiate a new game")
+@game_router.post("/initiate/{creator_id}", summary="Initiate a new game", status_code=201)
 async def initiate_new_game_endpoint(creator_id: int, game_data: GameCreate, request: Request, session: AsyncSession = Depends(get_database_session)): #TODO: this should get game data from request, just for test
     user_repo = UserRepository(session)
     game_repo = GameRepository(session)
     publisher = request.app.state.publisher
-    await initiate_new_game(creator_id, game_data, user_repo, game_repo, publisher)
-    return {"message": "Game initiated successfully"}
+    created_game = await initiate_new_game(creator_id, game_data, user_repo, game_repo, publisher)
+    return {"message": "Game initiated successfully", "payload": created_game}
