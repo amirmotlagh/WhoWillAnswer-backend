@@ -9,13 +9,20 @@ class WebsocketManager:
         self.active_users: dict[int, WebSocket] = {}
 
     
-    async def connect(self, user_id: int, websocket: WebSocket):
+    async def connect(self, user_id: int, websocket: WebSocket) -> None:
         await websocket.accept()
+        previous = self.active_users.get(user_id)
         self.active_users[user_id] = websocket
+        if previous is not None and previous is not websocket:
+            await previous.close(code=1000)
     
-    async def disconnect(self, user_id: int):
-        if user_id in self.active_users:
-            del self.active_users[user_id]
+    async def disconnect(self, user_id: int, websocket: WebSocket | None = None) -> None:
+        current = self.active_users.get(user_id)
+        if current is None:
+            return
+        if websocket is not None and current is not websocket:
+            return
+        del self.active_users[user_id]
     
     async def send_message(self, user_id: int, message: str):
         ws = self.active_users.get(user_id)

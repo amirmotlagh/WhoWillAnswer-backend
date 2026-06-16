@@ -7,9 +7,9 @@ from sqlalchemy.sql import func
 from app.infrastructure.database.base import Base
 
 class GameState(str, enum.Enum):
-    WAITING = "waiting"
-    ACTIVE = "active"
-    FINISHED = "finished"
+    WAITING = "WAITING"
+    ACTIVE = "ACTIVE"
+    FINISHED = "FINISHED"
 
 game_players = Table(
     "game_players",

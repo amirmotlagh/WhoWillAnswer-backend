@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import selectinload
 
 from app.core.domain.game import GameInfo
-from app.infrastructure.database.models import Game, game_players
+from app.infrastructure.database.models import Game, GameState, game_players
 
 
 class GameRepository:
@@ -14,7 +14,7 @@ class GameRepository:
         game_data = game_info.model_dump(exclude={"id", "players"})
         game = Game(**game_data)
         self.session.add(game)
-        await self.session.commit()
+        await self.session.flush()
         
         created_game = await self.get_game(game.id)
         if not created_game:
@@ -22,7 +22,7 @@ class GameRepository:
         return created_game
     
     async def get_active_games(self) -> list[GameInfo]:
-        stmt = select(Game).options(selectinload(Game.players)).where(Game.state == "active")
+        stmt = select(Game).options(selectinload(Game.players)).where(Game.state == GameState.ACTIVE)
         result = await self.session.execute(stmt)
         games = result.scalars().all()
         if games:
@@ -39,7 +39,6 @@ class GameRepository:
         stmt = pg_insert(game_players).values(values).on_conflict_do_nothing()
         
         await self.session.execute(stmt)
-        await self.session.commit()
         
         return await self.get_game(game_id)
 
@@ -54,8 +53,8 @@ class GameRepository:
 
     async def update_game(self, game_id: int, game_info: GameInfo):
         # Implement logic to update an existing game in the database
-        pass
+        raise NotImplementedError("GameRepository.update_game is not implemented yet")
 
     async def delete_game(self, game_id: int):
         # Implement logic to delete a game from the database
-        pass
+        raise NotImplementedError("GameRepository.delete_game is not implemented yet")

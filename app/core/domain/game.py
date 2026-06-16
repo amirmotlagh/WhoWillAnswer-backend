@@ -13,8 +13,8 @@ class GameInfo(BaseModel):
     creator_id: int = Field(..., gt=0, description="Must be a valid positive ID")
     name: str = Field(..., min_length=1, max_length=100)
     min_players: int = Field(..., ge=2, description="At least 2 players are required")
-    max_players: int = Field(..., le=50, description="Maximum number of players limit")
-    max_timeout: int | None = Field(default=120, gt=0, description="Timeout in seconds must be positive")
+    max_players: int = Field(..., ge=2, le=10, description="Maximum number of players limit")
+    max_timeout: int | None = Field(default=120, gt=60, lt=600, description="Timeout in seconds must be positive")
     category_id: int = Field(..., gt=0)
     password: str | None = None
     private: bool = False

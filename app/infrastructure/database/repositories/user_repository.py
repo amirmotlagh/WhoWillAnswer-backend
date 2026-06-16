@@ -20,9 +20,8 @@ class UserRepository:
     async def create_user(self, user_data: UserInfo) -> UserInfo:
         user = User(**user_data.model_dump())
         self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
+        await self.session.flush()
         return UserInfo.model_validate(user)
 
     async def update_user(self, user_id: int, user_data: dict) -> UserInfo | None:
-        pass
+        raise NotImplementedError("UserRepository.update_user is not implemented yet")

@@ -57,9 +57,9 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('game_id', 'question_id')
     )
     op.drop_constraint(op.f('answers_question_id_fkey'), 'answers', type_='foreignkey')
-    op.create_foreign_key(None, 'answers', 'questions', ['question_id'], ['id'])
+    op.create_foreign_key(None, 'answers', 'questions', ['question_id'], ['id'], ondelete='CASCADE')
     op.drop_constraint(op.f('questions_category_id_fkey'), 'questions', type_='foreignkey')
-    op.create_foreign_key(None, 'questions', 'categories', ['category_id'], ['id'])
+    op.create_foreign_key(None, 'questions', 'categories', ['category_id'], ['id'], ondelete='CASCADE')
     # ### end Alembic commands ###
 
 

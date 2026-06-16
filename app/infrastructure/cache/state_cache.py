@@ -27,10 +27,10 @@ async def delete_game_state(game_id):
     key = KeyBuilder.game_state_key(game_id)
     await CacheService.delete(key)
 
-async def set_game_players(room_id: str, players: list[int]):
-    key = KeyBuilder.game_players_key(room_id)
+async def set_game_players(game_id: str, players: list[int]):
+    key = KeyBuilder.game_players_key(game_id)
     await CacheService.set(key, players)
 
-async def get_game_players(room_id: str):
-    key = KeyBuilder.game_players_key(room_id)
+async def get_game_players(game_id: str):
+    key = KeyBuilder.game_players_key(game_id)
     return await CacheService.get(key)

@@ -21,10 +21,13 @@ async def on_match_created(envelope: dict[str, Any]) -> None:
     state = game_data.get("state", "waiting") # Default to waiting if not in schema
     
     if game_id:
-        await set_game_state(game_id, state)
+        state_cached = await set_game_state(game_id, state)
+        players_cached = True
         if creator_id:
-            await set_game_players(game_id, [creator_id])
-        
+            players_cached = await set_game_players(game_id, [creator_id])
+        if not state_cached or not players_cached:
+            logger.error("on_match_created cache write failed for game_id=%s", game_id)
+            return
         await broadcast_game_created(game_data)
         logger.info(f"Match created successfully processed for game_id: {game_id}")
 

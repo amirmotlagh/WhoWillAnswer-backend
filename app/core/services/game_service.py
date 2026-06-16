@@ -20,14 +20,20 @@ async def initiate_new_game(creator_id: int, game_data: GameCreate, user_repo: U
 
     game_info = GameInfo(**game_data.model_dump(), creator_id=creator_id)
 
-    game = await game_repo.create_game(game_info)
+    try:
+        game = await game_repo.create_game(game_info)
 
-    if not game or not game.id:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create game")
+        if not game or not game.id:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create game")
 
-    game = await game_repo.add_players_to_game(game.id, [user.id])
-    if not game:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to add creator to the game")
+        game = await game_repo.add_players_to_game(game.id, [user.id])
+        if not game:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to add creator to the game")
+        
+        await game_repo.session.commit()
+    except Exception:
+        await game_repo.session.rollback()
+        raise
     
     game_response = GameResponse(
         **game.model_dump(),
@@ -35,5 +41,5 @@ async def initiate_new_game(creator_id: int, game_data: GameCreate, user_repo: U
     )
 
     game_dict = jsonable_encoder(game_response)
-    event_id = str(uuid.uuid4())
+    event_id = str(uuid.uuid5(uuid.NAMESPACE_OID, f"match_created_{game.id}"))
     await publisher.publish(subject=Subjects.MATCH_CREATED, payload={"game_data": game_dict}, event_id=event_id)

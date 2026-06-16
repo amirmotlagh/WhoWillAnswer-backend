@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pydantic import ValidationError
 
 from app.infrastructure.websocket.connection_manager import websocket_manager
@@ -22,11 +22,13 @@ async def game_websocket_endpoint(ws: WebSocket, user_id: int): #TODO: this shou
             except ValidationError:
                 await websocket_manager.send_message(user_id, "Invalid message schema or JSON format")
                 continue
+    except WebSocketDisconnect as e:
+         logger.info("Connection aborted for user %s: %s", user_id, str(e))
     except Exception as e:
         logger.error("Unexpected error in websocket for user %s: %s", user_id, str(e))
     finally:
         logger.info("Cleaning up connection for user %s", user_id)
-        await websocket_manager.disconnect(user_id)
+        await websocket_manager.disconnect(user_id, ws)
 
 
 async def process_message(parsed_msg: IncomingWSMessage, user_id: int):
