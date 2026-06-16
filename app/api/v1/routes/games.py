@@ -32,6 +32,9 @@ async def initiate_new_game_endpoint(creator_id: int, game_data: GameCreate, req
     except ValueError as e:
         logger.error(f"Invalid game data: {e}")
         raise HTTPException(status_code=404, detail="Invalid game data")
+    except HTTPException as e:
+        logger.error(f"HTTP error occurred: {e}")
+        raise
     except SQLAlchemyError as e:
         logger.error(f"Database error occurred: {e}")
         raise HTTPException(status_code=500, detail="Database error occurred")
