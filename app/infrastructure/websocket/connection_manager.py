@@ -31,7 +31,7 @@ class WebsocketManager:
 			await ws.send_text(message)
 		except Exception:
 			logger.error('message not sent to user with id: %s', user_id)
-			await self.disconnect(user_id)
+			await self.disconnect(user_id, ws)
 
 	async def broadcast(self, message: str):
 		for user_id, ws in list(self.active_users.items()):
@@ -39,7 +39,7 @@ class WebsocketManager:
 				await ws.send_text(message)
 			except Exception:
 				logger.error('message not sent to user with id: %s', user_id)
-				await self.disconnect(user_id)
+				await self.disconnect(user_id, ws)
 
 	async def send_message_to_users(self, user_ids: list[int], message: str):
 		for user_id in user_ids:

@@ -10,7 +10,7 @@ class GameCreate(BaseModel):
 	name: str = Field(..., min_length=1, max_length=100)
 	min_players: int = Field(..., ge=2, description='At least 2 players are required')
 	max_players: int = Field(..., ge=2, le=10, description='Maximum number of players limit')
-	category_id: int = Field(..., ge=0)
+	category_id: int = Field(..., ge=1)
 	private: bool = False
 	password: str | None = None
 	max_timeout: int = Field(

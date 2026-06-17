@@ -1,10 +1,11 @@
 """Initial migration
 
 Revision ID: bbbcf69ab6be
-Revises: 
+Revises:
 Create Date: 2026-05-18 06:35:26.383484
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
