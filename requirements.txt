@@ -4,6 +4,7 @@ fastapi[standard]==0.120.1
 nats-py==2.14.0
 uvicorn==0.38.0
 redis==7.0.1
+pre-commit
 pydantic==2.12.3
 pydantic-settings==2.11.0
 python-dotenv==1.2.1
