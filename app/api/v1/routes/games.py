@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.services.game_service import initiate_new_game
+from app.infrastructure.database.repositories.category_repository import CategoryRepository
 from app.infrastructure.database.repositories.game_repository import GameRepository
 from app.infrastructure.database.session import get_database_session
 from app.logger import get_logger
@@ -33,12 +34,13 @@ async def initiate_new_game_endpoint(
 	try:
 		user_repo = UserRepository(session)
 		game_repo = GameRepository(session)
+		category_repo = CategoryRepository(session)
 		publisher = getattr(request.app.state, 'publisher', None)
 		if publisher is None:
 			logger.error('Publisher not available')
 			raise HTTPException(status_code=503, detail='Game service temporarily unavailable')
 		created_game = await initiate_new_game(
-			creator_id, game_data, user_repo, game_repo, publisher
+			creator_id, game_data, user_repo, game_repo, category_repo, publisher
 		)
 		return {'message': 'Game initiated successfully', 'payload': created_game}
 	except ValueError as e:

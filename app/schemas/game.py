@@ -2,6 +2,7 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.schemas.category import CategoryResponse
 from app.schemas.user import UserInfoForGame
 
 
@@ -32,6 +33,6 @@ class GameResponse(BaseModel):
 	players: list[UserInfoForGame]
 	min_players: int
 	max_players: int
-	category_id: int
+	category: CategoryResponse
 	private: bool
 	max_timeout: int

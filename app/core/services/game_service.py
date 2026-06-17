@@ -4,11 +4,13 @@ from fastapi.encoders import jsonable_encoder
 
 from app.core.domain.game import GameInfo
 from app.infrastructure.database.repositories.game_repository import GameRepository
+from app.infrastructure.database.repositories.category_repository import CategoryRepository
 from app.infrastructure.database.repositories.user_repository import UserRepository
 from app.infrastructure.messaging.subjects import Subjects
 from app.infrastructure.messaging.publisher import EventPublisher
 from app.schemas.game import GameCreate, GameResponse
 from app.schemas.user import UserInfoForGame
+from app.schemas.category import CategoryResponse
 
 
 async def initiate_new_game(
@@ -16,13 +18,16 @@ async def initiate_new_game(
 	game_data: GameCreate,
 	user_repo: UserRepository,
 	game_repo: GameRepository,
+	category_repo: CategoryRepository,
 	publisher: EventPublisher,
 ) -> GameResponse:
 	user = await user_repo.get_user_by_id(creator_id)
 	if not user or not user.id:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Creator user not found')
 
-	# TODO: add more validation logic (e.g. check if category exists)
+	category = await category_repo.get_category_by_id(game_data.category_id)
+	if not category:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Category not found')
 
 	game_info = GameInfo(**game_data.model_dump(), creator_id=creator_id)
 
@@ -46,7 +51,11 @@ async def initiate_new_game(
 		await game_repo.session.rollback()
 		raise
 
-	game_response = GameResponse(**game.model_dump(), creator=UserInfoForGame.model_validate(user))
+	game_response = GameResponse(
+		**game.model_dump(),
+		creator=UserInfoForGame.model_validate(user),
+		category=CategoryResponse.model_validate(category),
+	)
 
 	game_dict = jsonable_encoder(game_response)
 	event_id = str(uuid.uuid5(uuid.NAMESPACE_OID, f'match_created_{game.id}'))
