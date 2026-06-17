@@ -325,6 +325,28 @@ This project integrates **Redis** for caching and managing game/room states asyn
 
 ## ⚙️ Setup
 
+### set-up pre-commit
+install pre-commit with requirements.txt in your python environment
+or run
+```bash
+     pip install pre-commit
+```
+
+validate the installation with getting the pre-commit version
+```bash
+     pre-commit --version
+```
+
+install the git hook script by
+```bash
+     pre-commit install
+```
+
+(optional) Run against all the files:
+```bash
+     pre-commit run --all-files
+```
+
 ### 1️⃣ Environment Variables
 Add these to your `.env` or `.env.example` file:
 ```env
@@ -378,3 +400,16 @@ Connection pooling for efficiency
 Standardized key naming
 Built-in health check
 Supports both room and game caching
+
+
+### 6️⃣ migrations
+To generate migrations after running the docker-compose, run:
+
+``` bash
+     docker exec -u "$(id -u):$(id -g)" -it <backend-container-name> alembic revision --autogenerate -m "migration message used in name"
+```
+
+or simply run
+```bash
+     make migrate m="migration message used in name"
+```

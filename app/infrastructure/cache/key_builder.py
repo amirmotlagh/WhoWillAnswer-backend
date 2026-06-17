@@ -1,10 +1,15 @@
 class KeyBuilder:
-    ROOM = "room"
-    GAME = "game"
-    @classmethod
-    def room_state_key(cls, room_id: str):
-        return f"{cls.ROOM}:{room_id}:state"
+	ROOM = 'room'
+	GAME = 'game'
 
-    @classmethod
-    def game_state_key(cls, game_id: str):
-        return f"{cls.GAME}:{game_id}:state"
+	@classmethod
+	def room_state_key(cls, room_id: str):
+		return f'{cls.ROOM}:{room_id}:state'
+
+	@classmethod
+	def game_state_key(cls, game_id: str):
+		return f'{cls.GAME}:{game_id}:state'
+
+	@classmethod
+	def game_players_key(cls, game_id: str):
+		return f'{cls.GAME}:{game_id}:players'
