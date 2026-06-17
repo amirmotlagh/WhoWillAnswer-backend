@@ -5,10 +5,10 @@ from app.schemas.user import UserResponse
 
 
 class GameInitiateResponse(BaseModel):
-    message: str
-    payload: GameResponse
+	message: str
+	payload: GameResponse
 
 
 class UserCreateResponse(BaseModel):
-    message: str
-    payload: UserResponse
+	message: str
+	payload: UserResponse

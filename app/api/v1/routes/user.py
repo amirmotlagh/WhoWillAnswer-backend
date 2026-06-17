@@ -1,4 +1,3 @@
-
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -14,11 +13,16 @@ from app.schemas.user import UserCreate
 
 logger = get_logger(__name__)
 
-user_router = APIRouter(prefix="/user", tags=["user"])
+user_router = APIRouter(prefix='/user', tags=['user'])
 
-@user_router.post("/create/", summary="Create a new user", status_code=201, response_model=UserCreateResponse)
-async def create_user(user_data: UserCreate, session: Annotated[AsyncSession, Depends(get_database_session)]):
-    user_repo = UserRepository(session)
-    user = await user_service.create_user(user_data, user_repo)
-    
-    return {"message": "User created successfully", "payload": user}
+
+@user_router.post(
+	'/create/', summary='Create a new user', status_code=201, response_model=UserCreateResponse
+)
+async def create_user(
+	user_data: UserCreate, session: Annotated[AsyncSession, Depends(get_database_session)]
+):
+	user_repo = UserRepository(session)
+	user = await user_service.create_user(user_data, user_repo)
+
+	return {'message': 'User created successfully', 'payload': user}
