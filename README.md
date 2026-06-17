@@ -384,5 +384,10 @@ Supports both room and game caching
 To generate migrations after running the docker-compose, run:
 
 ``` bash
-     docker exec -it <backend-container-name> alembic revision --autogenerate -m "migration message used in name"
+     docker exec -u "$(id -u):$(id -g)" -it <backend-container-name> alembic revision --autogenerate -m "migration message used in name"
+```
+
+or simply run
+```bash
+     make migrate m="migration message used in name"
 ```
