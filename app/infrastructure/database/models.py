@@ -1,7 +1,7 @@
 import enum
 import datetime
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum, JSON
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
@@ -87,6 +87,18 @@ class Question(Base):
 	# Relationships
 	category: Mapped['Category'] = relationship(back_populates='questions')
 	games: Mapped[list['Game']] = relationship(secondary=game_questions, back_populates='questions')
+
+	@validates('answers', 'correct_answer')
+	def _validate_answers(self, key, value):
+		if key == 'answers':
+			if not isinstance(value, list) or len(value) != 4:
+				raise ValueError('Answers must be a list with exactly four options.')
+		elif key == 'correct_answer':
+			if not isinstance(value, int) or value < 0:
+				raise ValueError('Correct answer index must be a non-negative integer.')
+			if hasattr(self, 'answers') and (value >= len(self.answers)):
+				raise ValueError('Correct answer index must be within the range of answers.')
+		return value
 
 
 class Game(Base):

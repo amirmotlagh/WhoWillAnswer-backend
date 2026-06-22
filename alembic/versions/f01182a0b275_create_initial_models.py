@@ -122,9 +122,9 @@ def upgrade() -> None:
 		sa.Column('id', sa.Integer(), nullable=False),
 		sa.Column('text', sa.String(length=255), nullable=False),
 		sa.Column('category_id', sa.Integer(), nullable=False),
-		sa.Column('answers', sa.JSON(), nullable=False),
+		sa.Column('answers', sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
 		sa.Column('correct_answer', sa.Integer(), nullable=False),
-		sa.Column('approved', sa.Boolean(), nullable=False),
+		sa.Column('approved', sa.Boolean(), nullable=False, server_default=sa.false()),
 		sa.Column(
 			'created_at',
 			sa.DateTime(timezone=True),
