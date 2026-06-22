@@ -1,6 +1,7 @@
 import enum
 import datetime
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum, JSON
+from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.sql import func
 
@@ -74,9 +75,11 @@ class Question(Base):
 	id: Mapped[int] = mapped_column(primary_key=True, index=True)
 	text: Mapped[str] = mapped_column(String(255))
 	category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-	answers: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+	answers: Mapped[list[str]] = mapped_column(
+		MutableList.as_mutable(JSON), nullable=False, default=list, server_default='[]'
+	)
 	correct_answer: Mapped[int] = mapped_column(Integer, nullable=False)
-	approved: Mapped[bool] = mapped_column(default=False)
+	approved: Mapped[bool] = mapped_column(default=False, server_default='false')
 	created_at: Mapped[datetime.datetime] = mapped_column(
 		DateTime(timezone=True), server_default=func.now()
 	)

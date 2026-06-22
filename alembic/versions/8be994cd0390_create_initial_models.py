@@ -1,8 +1,8 @@
 """create initial models
 
-Revision ID: f01182a0b275
+Revision ID: 8be994cd0390
 Revises:
-Create Date: 2026-06-22 11:20:24.420874
+Create Date: 2026-06-22 12:26:10.190471
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f01182a0b275'
+revision: str = '8be994cd0390'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -122,9 +122,9 @@ def upgrade() -> None:
 		sa.Column('id', sa.Integer(), nullable=False),
 		sa.Column('text', sa.String(length=255), nullable=False),
 		sa.Column('category_id', sa.Integer(), nullable=False),
-		sa.Column('answers', sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
+		sa.Column('answers', sa.JSON(), server_default='[]', nullable=False),
 		sa.Column('correct_answer', sa.Integer(), nullable=False),
-		sa.Column('approved', sa.Boolean(), nullable=False, server_default=sa.false()),
+		sa.Column('approved', sa.Boolean(), server_default='false', nullable=False),
 		sa.Column(
 			'created_at',
 			sa.DateTime(timezone=True),
