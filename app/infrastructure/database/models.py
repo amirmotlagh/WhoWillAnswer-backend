@@ -1,6 +1,6 @@
 import enum
 import datetime
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -74,6 +74,9 @@ class Question(Base):
 	id: Mapped[int] = mapped_column(primary_key=True, index=True)
 	text: Mapped[str] = mapped_column(String(255))
 	category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+	answers: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+	correct_answer: Mapped[int] = mapped_column(Integer, nullable=False)
+	approved: Mapped[bool] = mapped_column(default=False)
 	created_at: Mapped[datetime.datetime] = mapped_column(
 		DateTime(timezone=True), server_default=func.now()
 	)
@@ -83,28 +86,7 @@ class Question(Base):
 
 	# Relationships
 	category: Mapped['Category'] = relationship(back_populates='questions')
-	answers: Mapped[list['Answer']] = relationship(
-		back_populates='question', cascade='all, delete-orphan'
-	)
 	games: Mapped[list['Game']] = relationship(secondary=game_questions, back_populates='questions')
-
-
-class Answer(Base):
-	__tablename__ = 'answers'
-
-	id: Mapped[int] = mapped_column(primary_key=True, index=True)
-	text: Mapped[str] = mapped_column(Text)
-	is_correct: Mapped[bool] = mapped_column(default=False)
-	question_id: Mapped[int] = mapped_column(ForeignKey('questions.id'))
-	created_at: Mapped[datetime.datetime] = mapped_column(
-		DateTime(timezone=True), server_default=func.now()
-	)
-	updated_at: Mapped[datetime.datetime] = mapped_column(
-		DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-	)
-
-	# Relationship to question
-	question: Mapped['Question'] = relationship(back_populates='answers')
 
 
 class Game(Base):
