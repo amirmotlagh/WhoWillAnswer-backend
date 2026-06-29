@@ -61,6 +61,11 @@ class Settings(BaseSettings):
 	NATS_URL: str = 'nats://nats:4222'
 	NATS_TOKEN: str | None = None
 
+	# Authentication
+	AUTH_SECRET_KEY: str = 'your_secret_key'
+	AUTH_ALGORITHM: str = 'HS256'
+	AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
 	model_config = {'env_file': ENV_FILE}
 
 

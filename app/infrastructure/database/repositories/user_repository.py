@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.database.models import User
 from app.core.domain.user import UserInfo
+from app.schemas.user import UserLogin
 
 
 class UserRepository:
@@ -21,6 +22,13 @@ class UserRepository:
 		self.session.add(user)
 		await self.session.flush()
 		return UserInfo.model_validate(user)
+
+	async def get_user_by_username(self, user_data: UserLogin) -> UserInfo | None:
+		result = await self.session.execute(select(User).where(User.username == user_data.username))
+		user = result.scalar_one_or_none()
+		if user:
+			return UserInfo.model_validate(user)
+		return None
 
 	async def update_user(self, user_id: int, user_data: dict) -> UserInfo | None:
 		raise NotImplementedError('UserRepository.update_user is not implemented yet')

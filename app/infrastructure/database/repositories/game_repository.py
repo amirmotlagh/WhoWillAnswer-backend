@@ -3,7 +3,8 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import selectinload
 
 from app.core.domain.game import GameInfo
-from app.infrastructure.database.models import Game, GameState, game_players
+from app.infrastructure.database.models import Game, game_players
+from app.utils.enums import GameState
 
 
 class GameRepository:

@@ -1,4 +1,3 @@
-import enum
 import datetime
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Table, Enum, JSON
 from sqlalchemy.ext.mutable import MutableList
@@ -6,13 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from sqlalchemy.sql import func
 
 from app.infrastructure.database.base import Base
-
-
-class GameState(str, enum.Enum):
-	WAITING = 'WAITING'
-	ACTIVE = 'ACTIVE'
-	FINISHED = 'FINISHED'
-
+from app.utils.enums import GameState, UserRoles
 
 game_players = Table(
 	'game_players',
@@ -40,6 +33,13 @@ class User(Base):
 	username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
 	full_name: Mapped[str | None] = mapped_column(String(255))
 	is_active: Mapped[bool] = mapped_column(default=True)
+	roles: Mapped[list[UserRoles]] = mapped_column(
+		MutableList.as_mutable(JSON),
+		nullable=False,
+		default=lambda: [UserRoles.USER],
+		server_default='["USER"]',
+	)
+	password: Mapped[str | None] = mapped_column(String(255), nullable=True)
 	created_at: Mapped[datetime.datetime] = mapped_column(
 		DateTime(timezone=True), server_default=func.now()
 	)

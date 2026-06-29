@@ -400,7 +400,7 @@ Connection pooling for efficiency
 Standardized key naming
 Built-in health check
 Supports both room and game caching
-
+```
 
 ### 6️⃣ migrations
 To generate migrations after running the docker-compose, run:
