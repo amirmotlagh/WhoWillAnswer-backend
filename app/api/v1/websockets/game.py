@@ -14,6 +14,7 @@ logger = get_logger('app.websocket.game')
 
 game_ws_router = APIRouter(prefix='/ws', tags=['websockets'])
 AUTH_MESSAGE_TIMEOUT_SECONDS = 20
+INACTIVITY_TIMEOUT_SECONDS = 60
 
 
 @game_ws_router.websocket('/')
@@ -47,7 +48,15 @@ async def game_websocket_endpoint(ws: WebSocket):
 		await ws.send_json({'status': 'authenticated'})
 
 		while True:
-			message = await ws.receive_text()
+			try:
+				message = await asyncio.wait_for(
+					ws.receive_text(), timeout=INACTIVITY_TIMEOUT_SECONDS
+				)
+			except asyncio.TimeoutError:
+				logger.info('Disconnecting user %s due to inactivity.', user_id)
+				await ws.close(code=status.WS_1000_NORMAL_CLOSURE, reason='Inactivity timeout')
+				break
+
 			try:
 				parsed_msg = IncomingWSMessage.model_validate_json(message)
 				if user_id is None:
