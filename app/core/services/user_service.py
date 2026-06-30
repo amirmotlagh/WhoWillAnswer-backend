@@ -21,7 +21,7 @@ async def create_user(user_data: UserCreate, user_repo: UserRepository) -> UserR
 	try:
 		user_info = UserInfo(**user_data.model_dump())
 		user_info.password = Hash.get_hashed_password(user_data.password)
-		user_info.roles = [UserRoles.USER.value]
+		user_info.roles = [UserRoles.USER]
 		user = await user_repo.create_user(user_info)
 		return UserResponse.model_validate(user)
 	except IntegrityError:
