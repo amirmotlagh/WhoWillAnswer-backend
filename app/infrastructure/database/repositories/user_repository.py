@@ -22,5 +22,12 @@ class UserRepository:
 		await self.session.flush()
 		return UserInfo.model_validate(user)
 
+	async def get_user_by_username(self, username: str) -> UserInfo | None:
+		result = await self.session.execute(select(User).where(User.username == username))
+		user = result.scalar_one_or_none()
+		if user:
+			return UserInfo.model_validate(user)
+		return None
+
 	async def update_user(self, user_id: int, user_data: dict) -> UserInfo | None:
 		raise NotImplementedError('UserRepository.update_user is not implemented yet')

@@ -5,31 +5,26 @@ from fastapi.encoders import jsonable_encoder
 from app.core.domain.game import GameInfo
 from app.infrastructure.database.repositories.game_repository import GameRepository
 from app.infrastructure.database.repositories.category_repository import CategoryRepository
-from app.infrastructure.database.repositories.user_repository import UserRepository
 from app.infrastructure.messaging.subjects import Subjects
 from app.infrastructure.messaging.publisher import EventPublisher
 from app.schemas.game import GameCreate, GameResponse
-from app.schemas.user import UserInfoForGame
+from app.schemas.user import UserData, UserInfoForGame
 from app.schemas.category import CategoryResponse
 
 
 async def initiate_new_game(
-	creator_id: int,
+	creator: UserData,
 	game_data: GameCreate,
-	user_repo: UserRepository,
 	game_repo: GameRepository,
 	category_repo: CategoryRepository,
 	publisher: EventPublisher,
 ) -> GameResponse:
-	user = await user_repo.get_user_by_id(creator_id)
-	if not user or not user.id:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Creator user not found')
 
 	category = await category_repo.get_category_by_id(game_data.category_id)
 	if not category:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Category not found')
 
-	game_info = GameInfo(**game_data.model_dump(), creator_id=creator_id)
+	game_info = GameInfo(**game_data.model_dump(), creator_id=creator.id)
 
 	try:
 		game = await game_repo.create_game(game_info)
@@ -39,7 +34,7 @@ async def initiate_new_game(
 				status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Failed to create game'
 			)
 
-		game = await game_repo.add_players_to_game(game.id, [user.id])
+		game = await game_repo.add_players_to_game(game.id, [creator.id])
 		if not game:
 			raise HTTPException(
 				status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -53,7 +48,7 @@ async def initiate_new_game(
 
 	game_response = GameResponse(
 		**game.model_dump(),
-		creator=UserInfoForGame.model_validate(user),
+		creator=UserInfoForGame.model_validate(creator),
 		category=CategoryResponse.model_validate(category),
 	)
 

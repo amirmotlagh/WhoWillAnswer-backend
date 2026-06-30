@@ -1,14 +1,11 @@
-from pydantic import BaseModel
+from typing import Generic, TypeVar
+from pydantic import BaseModel, Field
 
-from app.schemas.game import GameResponse
-from app.schemas.user import UserResponse
-
-
-class GameInitiateResponse(BaseModel):
-	message: str
-	payload: GameResponse
+PayloadType = TypeVar('PayloadType')
 
 
-class UserCreateResponse(BaseModel):
-	message: str
-	payload: UserResponse
+class StandardResponse(BaseModel, Generic[PayloadType]):
+	message: str = Field(
+		..., description='A human-readable message indicating the result of the operation.'
+	)
+	payload: PayloadType | None = Field(None, description='The data returned by the endpoint.')

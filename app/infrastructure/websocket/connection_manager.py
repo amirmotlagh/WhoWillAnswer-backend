@@ -9,7 +9,6 @@ class WebsocketManager:
 		self.active_users: dict[int, WebSocket] = {}
 
 	async def connect(self, user_id: int, websocket: WebSocket) -> None:
-		await websocket.accept()
 		previous = self.active_users.get(user_id)
 		self.active_users[user_id] = websocket
 		if previous is not None and previous is not websocket:

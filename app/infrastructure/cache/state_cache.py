@@ -1,6 +1,6 @@
 from app.infrastructure.cache.key_builder import KeyBuilder
 from app.infrastructure.cache.cache_service import CacheService
-from app.infrastructure.database.models import GameState
+from app.utils.enums import GameState
 
 
 async def set_room_state(room_id: str, state: GameState):
