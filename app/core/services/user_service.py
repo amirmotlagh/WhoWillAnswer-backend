@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from sqlalchemy.exc import IntegrityError
 
+from app.config import settings
 from app.core.domain.user import UserInfo
 from app.core.exceptions import (
 	InactiveUserError,
@@ -18,12 +21,14 @@ async def create_user(user_data: UserCreate, user_repo: UserRepository) -> UserR
 	try:
 		user_info = UserInfo(**user_data.model_dump())
 		user_info.password = Hash.get_hashed_password(user_data.password)
-		user_info.roles = [UserRoles.USER]
+		user_info.roles = [UserRoles.USER.value]
 		user = await user_repo.create_user(user_info)
 		return UserResponse.model_validate(user)
 	except IntegrityError:
 		await user_repo.session.rollback()
-		raise UserAlreadyExistsError('A user with this username or email already exists.')
+		raise UserAlreadyExistsError(
+			'A user with this username, phone number, or email already exists.'
+		)
 
 
 async def login_user_with_password(user_data: UserLogin, user_repo: UserRepository) -> Token:
@@ -38,16 +43,12 @@ async def login_user_with_password(user_data: UserLogin, user_repo: UserReposito
 	if not user.roles or len(user.roles) == 0:
 		raise UserLacksRolesError('User has no roles assigned')
 
-	token_data = TokenInputData(
-		user_id=user.id,
-		username=user.username,
-		full_name=user.full_name,
-		email=user.email,
-		phone_number=user.phone_number,
-		is_active=user.is_active,
-		roles=user.roles,
-	)
+	token_data = TokenInputData(user_id=user.id)
 
-	access_token = create_access_token(token_data)
-	refresh_token = create_refresh_token(token_data)
+	access_token = create_access_token(
+		token_data, timedelta(minutes=settings.AUTH_ACCESS_TOKEN_EXPIRE_MINUTES)
+	)
+	refresh_token = create_refresh_token(
+		token_data, timedelta(minutes=settings.AUTH_REFRESH_TOKEN_EXPIRE_MINUTES)
+	)
 	return Token(access_token=access_token, refresh_token=refresh_token)

@@ -8,12 +8,12 @@ class UserCreate(BaseModel):
 	email: EmailStr = Field(..., max_length=255)
 	full_name: str | None = None
 	phone_number: str | None = None
-	password: str = Field(..., min_length=1, max_length=100)
+	password: str = Field(..., min_length=6, max_length=100)
 
 
 class UserLogin(BaseModel):
 	username: str = Field(..., min_length=1, max_length=100)
-	password: str = Field(..., min_length=1, max_length=100)
+	password: str = Field(..., min_length=6, max_length=100)
 
 
 class UserResponse(BaseModel):
@@ -52,12 +52,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
 	user_id: int
-	username: str
-	email: EmailStr
-	full_name: str | None = None
-	phone_number: str | None = None
-	is_active: bool | None = None
-	roles: list[UserRoles] = []
 
 
 class UserData(BaseModel):
@@ -69,4 +63,4 @@ class UserData(BaseModel):
 	full_name: str | None = None
 	phone_number: str | None = None
 	is_active: bool | None = None
-	roles: list[UserRoles] = []
+	roles: list[UserRoles] = Field(default_factory=list)

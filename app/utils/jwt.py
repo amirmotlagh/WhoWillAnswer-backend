@@ -1,22 +1,15 @@
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from jose import JWTError, jwt
 
 from app.config import settings
 from app.schemas.user import TokenData
-from app.utils.enums import UserRoles
 
 
 @dataclass
 class TokenInputData:
 	user_id: int
-	username: str
-	email: str
-	is_active: bool
-	full_name: str | None = None
-	phone_number: str | None = None
-	roles: list[UserRoles] = field(default_factory=list)
 
 
 def create_access_token(data: TokenInputData, expires_delta: timedelta | None = None) -> str:

@@ -1,5 +1,8 @@
+import json
+
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect, status
-from pydantic import ValidationError, json
+from pydantic import ValidationError
+from starlette.websockets import WebSocketState
 
 from app.infrastructure.websocket.connection_manager import websocket_manager
 from app.logger import get_logger
@@ -8,22 +11,25 @@ from app.utils.jwt import decode_token
 
 logger = get_logger('app.websocket.game')
 
-
 game_ws_router = APIRouter(prefix='/ws', tags=['websockets'])
 
 
 @game_ws_router.websocket('/')
 async def game_websocket_endpoint(ws: WebSocket):
+	await ws.accept()
 	user_id: int | None = None
-	token = ws.query_params.get('token')
-	if not token:
-		await ws.close(code=status.WS_1008_POLICY_VIOLATION, reason='Token not provided')
-		return
 
 	try:
+		auth_message = await ws.receive_json()
+		token = auth_message.get('token')
+		if not token:
+			await ws.close(code=status.WS_1008_POLICY_VIOLATION, reason='Auth token not provided')
+			return
+
 		token_data = await decode_token(token)
 		user_id = token_data.user_id
 		await websocket_manager.connect(user_id, ws)
+		await ws.send_json({'status': 'authenticated'})
 
 		while True:
 			message = await ws.receive_text()
@@ -42,14 +48,11 @@ async def game_websocket_endpoint(ws: WebSocket):
 	except WebSocketDisconnect as e:
 		logger.info('Connection aborted for user %s: %s', user_id, str(e))
 	except HTTPException as e:
-		client_host = ws.client.host if ws.client else 'unknown'
-		logger.warning('WebSocket connection failed auth for client %s: %s', client_host, e.detail)
-		await ws.close(
-			code=status.WS_1008_POLICY_VIOLATION, reason=f'Authentication failed: {e.detail}'
-		)
+		reason = e.detail if isinstance(e.detail, str) else 'Authentication failed'
+		await ws.close(code=status.WS_1008_POLICY_VIOLATION, reason=reason)
 	except Exception as e:
 		logger.error('Unexpected error in websocket for user %s: %s', user_id, str(e))
-		if not ws.client_state.DISCONNECTED:
+		if ws.client_state != WebSocketState.DISCONNECTED:
 			await ws.close(
 				code=status.WS_1011_INTERNAL_ERROR, reason='An unexpected server error occurred.'
 			)

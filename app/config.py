@@ -36,6 +36,10 @@ class Settings(BaseSettings):
 			self.DATABASE_USERNAME == 'username' or self.DATABASE_PASSWORD == 'password'
 		):
 			raise ValueError('DATABASE_USERNAME and DATABASE_PASSWORD must be set in production')
+		if not self.DEBUG and (
+			self.AUTH_SECRET_KEY is None or self.AUTH_SECRET_KEY == 'your_secret_key'
+		):
+			raise ValueError('AUTH_SECRET_KEY must be set in production')
 
 	@property
 	def DATABASE_URL(self) -> str:
@@ -62,9 +66,10 @@ class Settings(BaseSettings):
 	NATS_TOKEN: str | None = None
 
 	# Authentication
-	AUTH_SECRET_KEY: str = 'your_secret_key'
+	AUTH_SECRET_KEY: str
 	AUTH_ALGORITHM: str = 'HS256'
 	AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+	AUTH_REFRESH_TOKEN_EXPIRE_MINUTES: int = 7 * 24 * 60  # 7 days
 
 	model_config = {'env_file': ENV_FILE}
 

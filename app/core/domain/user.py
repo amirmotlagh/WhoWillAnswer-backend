@@ -1,5 +1,4 @@
-from pydantic import BaseModel, ConfigDict
-from app.utils.enums import UserRoles
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserInfo(BaseModel):
@@ -8,7 +7,7 @@ class UserInfo(BaseModel):
 	id: int | None = None
 	email: str
 	username: str
-	roles: list[UserRoles] = []
+	roles: list[str] = Field(default_factory=list)
 	full_name: str | None = None
 	is_active: bool = True
 	phone_number: str | None = None

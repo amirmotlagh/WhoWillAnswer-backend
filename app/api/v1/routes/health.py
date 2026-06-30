@@ -33,6 +33,8 @@ async def is_redis_available():
 				},
 			)
 		return StandardResponse(message='Redis connection is healthy', payload={'status': 'ok'})
+	except HTTPException:
+		raise
 	except Exception as e:
 		logger.error(f'Error checking Redis health: {e}')
 		raise HTTPException(

@@ -33,10 +33,10 @@ class User(Base):
 	username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
 	full_name: Mapped[str | None] = mapped_column(String(255))
 	is_active: Mapped[bool] = mapped_column(default=True)
-	roles: Mapped[list[UserRoles]] = mapped_column(
+	roles: Mapped[list[str]] = mapped_column(
 		MutableList.as_mutable(JSON),
 		nullable=False,
-		default=lambda: [UserRoles.USER],
+		default=lambda: [UserRoles.USER.value],
 		server_default='["USER"]',
 	)
 	password: Mapped[str | None] = mapped_column(String(255), nullable=True)

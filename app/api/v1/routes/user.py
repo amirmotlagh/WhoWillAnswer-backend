@@ -37,8 +37,8 @@ async def create_user(
 		return StandardResponse(message='User created successfully', payload=user)
 	except UserAlreadyExistsError as e:
 		raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
-	except Exception as e:
-		logger.error(f'Error creating user: {e}')
+	except Exception:
+		logger.error('Error creating user')
 		raise HTTPException(
 			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Could not create user.'
 		)
@@ -62,8 +62,8 @@ async def login_user(
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 	except UserLacksRolesError as e:
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-	except Exception as e:
-		logger.error(f'Error during login for user {user_data.username}: {e}')
+	except Exception:
+		logger.error('Error during login')
 		raise HTTPException(
 			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 			detail='An unexpected error occurred during login.',

@@ -374,7 +374,7 @@ from app.infrastructure.cache.cache_service import CacheService
 await CacheService.set("room:123:state", "active")
 state = await CacheService.get("room:123:state")
 print(state)  # -> active
-
+```
 
 ### 4️⃣ Health Check
 **File:**  
@@ -387,7 +387,7 @@ Performs a PING to the configured Redis host (settings.REDIS_HOST) to verify con
 Response:
 Returns HTTP 200 if Redis responds successfully.
 Returns HTTP 503 if Redis is unreachable or an error occurs.
-
+```
 ### 5️⃣ Key Naming Convention
 
 All Redis keys follow this format:
@@ -400,7 +400,6 @@ Connection pooling for efficiency
 Standardized key naming
 Built-in health check
 Supports both room and game caching
-```
 
 ### 6️⃣ migrations
 To generate migrations after running the docker-compose, run:
