@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect, status
@@ -12,6 +13,7 @@ from app.utils.jwt import decode_token
 logger = get_logger('app.websocket.game')
 
 game_ws_router = APIRouter(prefix='/ws', tags=['websockets'])
+AUTH_MESSAGE_TIMEOUT_SECONDS = 20
 
 
 @game_ws_router.websocket('/')
@@ -20,9 +22,22 @@ async def game_websocket_endpoint(ws: WebSocket):
 	user_id: int | None = None
 
 	try:
-		auth_message = await ws.receive_json()
+		auth_message = await asyncio.wait_for(
+			ws.receive_json(), timeout=AUTH_MESSAGE_TIMEOUT_SECONDS
+		)
+	except asyncio.TimeoutError:
+		await ws.close(code=status.WS_1008_POLICY_VIOLATION, reason='Auth message timeout')
+		return
+
+	if not isinstance(auth_message, dict):
+		await ws.close(
+			code=status.WS_1008_POLICY_VIOLATION, reason='Invalid authentication message format'
+		)
+		return
+
+	try:
 		token = auth_message.get('token')
-		if not token:
+		if not token or not isinstance(token, str):
 			await ws.close(code=status.WS_1008_POLICY_VIOLATION, reason='Auth token not provided')
 			return
 
