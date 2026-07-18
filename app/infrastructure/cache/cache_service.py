@@ -16,7 +16,8 @@ class CacheService:
 				value = json.dumps(value)
 			await client.set(key, value, ex=expire)
 			return True
-		except Exception:
+		except Exception as e:
+			print(f'Failed to set cache for key: {key} with value: {value}. Exception: {e}')
 			# TODO add logging
 			return False
 

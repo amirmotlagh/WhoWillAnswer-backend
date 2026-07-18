@@ -11,6 +11,8 @@ from app.logger import setup_logging, get_logger
 from app.api.v1.routes.health import health_router
 from app.api.v1.websockets.game import game_ws_router
 from app.api.v1.routes.games import game_router
+from app.api.v1.routes.question import question_router
+from app.api.v1.routes.category import category_router
 from app.api.v1.routes.user import user_router
 
 import asyncio
@@ -98,3 +100,5 @@ app.include_router(health_router)
 app.include_router(game_ws_router)
 app.include_router(game_router)
 app.include_router(user_router)
+app.include_router(question_router)
+app.include_router(category_router)

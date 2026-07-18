@@ -1,14 +1,23 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.interfaces.category import ICategoryRepository
+from app.core.interfaces.question import IQuestionRepository
+from app.core.services.category_service import CategoryService
+from app.core.services.question_service import QuestionService
+from app.infrastructure.database.repositories.category_repository import CategoryRepository
+from app.infrastructure.database.repositories.question_repository import QuestionRepository
 from app.infrastructure.database.repositories.user_repository import UserRepository
 from app.infrastructure.database.session import get_database_session
+from app.logger import get_logger
 from app.schemas.user import UserData
 from app.utils.enums import UserRoles
 from app.utils.jwt import decode_token
+
+logger = get_logger(__name__)
 
 security = HTTPBearer()
 
@@ -50,3 +59,29 @@ class RoleChecker:
 require_admin = RoleChecker([UserRoles.ADMIN])
 require_moderator = RoleChecker([UserRoles.ADMIN, UserRoles.MODERATOR])
 require_user = RoleChecker([UserRoles.ADMIN, UserRoles.MODERATOR, UserRoles.USER])
+
+
+def get_category_repo(session: AsyncSession = Depends(get_database_session)) -> ICategoryRepository:
+	return CategoryRepository(session)
+
+
+def get_category_service(
+	request: Request,
+	category_repo: ICategoryRepository = Depends(get_category_repo),
+) -> CategoryService | None:
+	publisher = getattr(request.app.state, 'publisher', None)
+	if publisher is None:
+		logger.error('Publisher not available')
+		raise HTTPException(status_code=503, detail='Game service temporarily unavailable')
+	return CategoryService(category_repo, publisher)
+
+
+def get_question_repo(session: AsyncSession = Depends(get_database_session)) -> IQuestionRepository:
+	return QuestionRepository(session)
+
+
+def get_question_service(
+	question_repo: IQuestionRepository = Depends(get_question_repo),
+	category_repo: ICategoryRepository = Depends(get_category_repo),
+) -> QuestionService:
+	return QuestionService(question_repo, category_repo)

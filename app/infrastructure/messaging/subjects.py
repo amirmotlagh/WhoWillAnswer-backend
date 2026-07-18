@@ -17,6 +17,9 @@ class Subjects(StrEnum):
 	MATCH_STARTED = 'game.match.started'
 	MATCH_ENDED = 'game.match.ended'
 
+	# Category lifecycle
+	CATEGORY_CREATED = 'game.category.created'
+
 	# System
 	SYSTEM_HEALTH = 'game.system.health'
 
@@ -25,3 +28,4 @@ class SubjectPatterns(StrEnum):
 	ALL_GAME = 'game.>'
 	ALL_PLAYER = 'game.player.*'
 	ALL_MATCH = 'game.match.*'
+	ALL_CATEGORY = 'game.category.*'
