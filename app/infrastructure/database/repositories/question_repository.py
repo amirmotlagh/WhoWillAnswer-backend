@@ -43,7 +43,7 @@ class QuestionRepository(IQuestionRepository):
 			.values(question.model_dump(exclude={'id', 'category'}))
 		)
 		await self.session.execute(stmt)
-		await self.session.commit()
+		await self.session.flush()
 
 		return await self.get_question_by_id(question.id)
 
@@ -51,7 +51,7 @@ class QuestionRepository(IQuestionRepository):
 		stmt = (
 			select(Question)
 			.options(selectinload(Question.category))
-			.where(Question.approved == False)  # noqa: E712
+			.where(Question.approved.is_(False))
 		)
 		result = await self.session.execute(stmt)
 		questions = result.scalars().all()
@@ -63,7 +63,7 @@ class QuestionRepository(IQuestionRepository):
 		stmt = (
 			select(Question)
 			.options(selectinload(Question.category))
-			.where(Question.category_id == category_id, Question.approved == True)  # noqa: E712
+			.where(Question.category_id == category_id, Question.approved.is_(True))
 		)
 		result = await self.session.execute(stmt)
 		questions = result.scalars().all()

@@ -39,8 +39,6 @@ class QuestionService:
 		if not questions:
 			return []
 
-		print(f'Unapproved questions retrieved: {questions}')
-
 		return [QuestionResponse(**q.model_dump()) for q in questions]
 
 	async def get_approved_questions_of_category(self, category_id: int) -> list[QuestionResponse]:

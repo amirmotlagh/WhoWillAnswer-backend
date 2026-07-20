@@ -30,7 +30,7 @@ async def get_all_categories(
 		return StandardResponse(message='Categories retrieved successfully', payload=categories)
 	except Exception as e:
 		logger.error(f'Unexpected error occurred: {e}')
-		raise HTTPException(status_code=500, detail='Internal server error')
+		raise HTTPException(status_code=500, detail='Internal server error') from e
 
 
 @category_router.post(
@@ -49,4 +49,4 @@ async def create_new_category(
 		return StandardResponse(message='Category created successfully', payload=created_category)
 	except CreationFailedException as e:
 		logger.error(f'Failed to create category: {e}')
-		raise HTTPException(status_code=500, detail='Failed to create category')
+		raise HTTPException(status_code=500, detail='Failed to create category') from e

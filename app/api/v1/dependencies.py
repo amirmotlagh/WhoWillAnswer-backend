@@ -68,11 +68,11 @@ def get_category_repo(session: AsyncSession = Depends(get_database_session)) -> 
 def get_category_service(
 	request: Request,
 	category_repo: ICategoryRepository = Depends(get_category_repo),
-) -> CategoryService | None:
+) -> CategoryService:
 	publisher = getattr(request.app.state, 'publisher', None)
 	if publisher is None:
 		logger.error('Publisher not available')
-		raise HTTPException(status_code=503, detail='Game service temporarily unavailable')
+		raise HTTPException(status_code=503, detail='service temporarily unavailable')
 	return CategoryService(category_repo, publisher)
 
 

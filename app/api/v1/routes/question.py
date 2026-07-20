@@ -33,7 +33,7 @@ async def add_new_question(
 		return StandardResponse(message='Question added successfully', payload=created_question)
 	except EntityNotFoundException as e:
 		logger.error(f'Entity not found: {e}')
-		raise HTTPException(status_code=404, detail=str(e))
+		raise HTTPException(status_code=404, detail=str(e)) from e
 	except CreationFailedException as e:
 		logger.error(f'Failed to create question: {e}')
 		raise HTTPException(status_code=500, detail=str(e))
@@ -55,10 +55,7 @@ async def get_unapproved_questions(
 	_: Annotated[UserData, Depends(require_moderator)],
 	question_service: Annotated[QuestionService, Depends(get_question_service)],
 ):
-
 	questions = await question_service.unapproved_questions()
-	if not questions:
-		raise HTTPException(status_code=404, detail='No unapproved questions found')
 	return StandardResponse(
 		message='Unapproved questions retrieved successfully', payload=questions
 	)
@@ -80,4 +77,4 @@ async def approve_a_question(
 		return StandardResponse(message='Question approved successfully', payload=None)
 	except EntityNotFoundException as e:
 		logger.error(f'Question not found: {e}')
-		raise HTTPException(status_code=404, detail='Question not found')
+		raise HTTPException(status_code=404, detail='Question not found') from e
