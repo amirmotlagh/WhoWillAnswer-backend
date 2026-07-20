@@ -21,7 +21,7 @@ class CacheService:
 			await client.set(key, value, ex=expire)
 			return True
 		except Exception as e:
-			logger.error(f'Failed to set cache for key: {key} with value: {value}. Exception: {e}')
+			logger.error('Failed to set cache for key: %s. Exception: %s', key, e)
 			return False
 
 	@staticmethod
@@ -40,7 +40,7 @@ class CacheService:
 
 			return data
 		except Exception as e:
-			logger.error(f'Failed to get cache for key: {key}. Exception: {e}')
+			logger.error('Failed to get cache for key: %s. Exception: %s', key, e)
 			return None
 
 	@staticmethod
@@ -53,7 +53,7 @@ class CacheService:
 			await client.delete(key)
 			return True
 		except Exception as e:
-			logger.error(f'Failed to delete cache for key: {key}. Exception: {e}')
+			logger.error('Failed to delete cache for key: %s. Exception: %s', key, e)
 			return False
 
 	@staticmethod
@@ -65,5 +65,5 @@ class CacheService:
 		try:
 			return bool(await client.exists(key))
 		except Exception as e:
-			logger.error(f'Failed to get cache for key: {key}. Exception: {e}')
+			logger.error('Failed to get cache for key: %s. Exception: %s', key, e)
 			return False
