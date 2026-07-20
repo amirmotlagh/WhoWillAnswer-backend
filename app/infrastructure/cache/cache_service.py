@@ -3,6 +3,10 @@ from typing import Any
 from app.infrastructure.cache.redis_client import redis_client
 import json
 
+from app.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class CacheService:
 	@staticmethod
@@ -16,8 +20,8 @@ class CacheService:
 				value = json.dumps(value)
 			await client.set(key, value, ex=expire)
 			return True
-		except Exception:
-			# TODO add logging
+		except Exception as e:
+			logger.error('Failed to set cache for key: %s. Exception: %s', key, e)
 			return False
 
 	@staticmethod
@@ -35,8 +39,8 @@ class CacheService:
 				return json.loads(data)
 
 			return data
-		except Exception:
-			# TODO add logging
+		except Exception as e:
+			logger.error('Failed to get cache for key: %s. Exception: %s', key, e)
 			return None
 
 	@staticmethod
@@ -48,8 +52,8 @@ class CacheService:
 		try:
 			await client.delete(key)
 			return True
-		except Exception:
-			# TODO add logging
+		except Exception as e:
+			logger.error('Failed to delete cache for key: %s. Exception: %s', key, e)
 			return False
 
 	@staticmethod
@@ -60,6 +64,6 @@ class CacheService:
 
 		try:
 			return bool(await client.exists(key))
-		except Exception:
-			# TODO add logging
+		except Exception as e:
+			logger.error('Failed to get cache for key: %s. Exception: %s', key, e)
 			return False
