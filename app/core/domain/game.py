@@ -2,6 +2,7 @@ from typing import Self
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 from app.core.domain.user import UserInfo
+from app.utils.enums import GameState
 
 
 class GameInfo(BaseModel):
@@ -19,6 +20,7 @@ class GameInfo(BaseModel):
 	password: str | None = None
 	private: bool = False
 	players: list[UserInfo] = []
+	state: GameState = GameState.WAITING
 
 	@model_validator(mode='after')
 	def check_players_count(self) -> Self:

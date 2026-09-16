@@ -18,3 +18,8 @@ class IQuestionRepository(ABC):
 
 	@abstractmethod
 	async def get_approved_questions_of_category(self, category_id: int) -> list[QuestionInfo]: ...
+
+	@abstractmethod
+	async def get_random_approved_questions_category(
+		self, category_id: int, count: int
+	) -> list[QuestionInfo]: ...

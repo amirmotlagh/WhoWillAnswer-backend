@@ -71,6 +71,9 @@ class Settings(BaseSettings):
 	AUTH_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 	AUTH_REFRESH_TOKEN_EXPIRE_MINUTES: int = 7 * 24 * 60  # 7 days
 
+	# Game Config
+	QUESTIONS_PER_PLAYER: int = 15
+
 	model_config = {'env_file': ENV_FILE}
 
 

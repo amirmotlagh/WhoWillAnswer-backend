@@ -1,4 +1,4 @@
-from sqlalchemy import select, update
+from sqlalchemy import select, func, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.domain.question import QuestionInfo
@@ -64,6 +64,22 @@ class QuestionRepository(IQuestionRepository):
 			select(Question)
 			.options(selectinload(Question.category))
 			.where(Question.category_id == category_id, Question.approved.is_(True))
+		)
+		result = await self.session.execute(stmt)
+		questions = result.scalars().all()
+		if questions:
+			return [QuestionInfo.model_validate(question) for question in questions]
+		return []
+
+	async def get_random_approved_questions_category(
+		self, category_id: int, count: int
+	) -> list[QuestionInfo]:
+		stmt = (
+			select(Question)
+			.options(selectinload(Question.category))
+			.where(Question.category_id == category_id, Question.approved.is_(True))
+			.order_by(func.random())
+			.limit(count)
 		)
 		result = await self.session.execute(stmt)
 		questions = result.scalars().all()

@@ -62,8 +62,8 @@ async def login_user(
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 	except UserLacksRolesError as e:
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
-	except Exception:
-		logger.error('Error during login')
+	except Exception as e:
+		logger.error('Error during login', e)
 		raise HTTPException(
 			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 			detail='An unexpected error occurred during login.',

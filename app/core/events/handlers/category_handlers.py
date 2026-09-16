@@ -1,8 +1,6 @@
 from typing import Any
 
-from app.infrastructure.cache.category_cache import (
-	delete_category_cache,
-)
+from app.infrastructure.cache.category_cache import CategoryCache
 from app.logger import get_logger
 
 
@@ -17,4 +15,4 @@ async def on_category_created(envelope: dict[str, Any]) -> None:
 	event_id = envelope.get('event_id')
 	logger.info('on_category_created processing event_id=%s', event_id)
 
-	await delete_category_cache()
+	await CategoryCache().delete_category_cache()

@@ -1,4 +1,5 @@
 from app.core.interfaces.question import IQuestionRepository
+from app.infrastructure.cache.game_cache import GameCache
 from app.core.interfaces.category import ICategoryRepository
 from app.schemas.question import QuestionCreate, QuestionResponse
 from app.core.domain.question import QuestionInfo
@@ -41,6 +42,17 @@ class QuestionService:
 
 		return [QuestionResponse(**q.model_dump()) for q in questions]
 
-	async def get_approved_questions_of_category(self, category_id: int) -> list[QuestionResponse]:
-		questions = await self.question_repo.get_approved_questions_of_category(category_id)
-		return [QuestionResponse(**q.model_dump()) for q in questions]
+	async def get_approved_questions_of_category(self, category_id: int) -> list[QuestionInfo]:
+		return await self.question_repo.get_approved_questions_of_category(category_id)
+
+	async def get_random_approved_questions_category(
+		self, category_id: int, count: int
+	) -> list[QuestionInfo]:
+		return await self.question_repo.get_random_approved_questions_category(category_id, count)
+
+	async def prepare_game_questions(self, game_id, category_id: int, count: int) -> bool:
+		questions = await self.get_random_approved_questions_category(category_id, count)
+		if not questions:
+			raise EntityNotFoundException('questions', f'{category_id} category with {count} count')
+		game_cache = GameCache(game_id)
+		return await game_cache.set_game_questions(questions)

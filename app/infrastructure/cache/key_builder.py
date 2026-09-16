@@ -18,3 +18,11 @@ class KeyBuilder:
 	@classmethod
 	def all_categories_cache_key(cls) -> str:
 		return f'{cls.CATEGORY}:all'
+
+	@classmethod
+	def game_questions_key(cls, game_id: str) -> str:
+		return f'{cls.GAME}:{game_id}:questions'
+
+	@classmethod
+	def game_data_key(cls, game_id: str) -> str:
+		return f'{cls.GAME}:{game_id}:data'

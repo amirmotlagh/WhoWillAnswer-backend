@@ -32,6 +32,16 @@ class GameRepository:
 			return [GameInfo.model_validate(game) for game in games]
 		return []
 
+	async def get_waiting_games(self) -> list[GameInfo]:
+		stmt = (
+			select(Game).options(selectinload(Game.players)).where(Game.state == GameState.WAITING)
+		)
+		result = await self.session.execute(stmt)
+		games = result.scalars().all()
+		if games:
+			return [GameInfo.model_validate(game) for game in games]
+		return []
+
 	async def add_players_to_game(self, game_id: int, player_ids: list[int]) -> GameInfo | None:
 		if not player_ids:
 			return await self.get_game(game_id)
