@@ -15,3 +15,13 @@ async def broadcast_game_created(game_data: dict[str, Any]) -> None:
 	except Exception as e:
 		logger.error(f'Failed to broadcast game.created event: {e}')
 		raise
+
+
+async def broadcast_game_questions_prepared(game_id: int) -> None:
+	try:
+		message = {'type': 'game.questions.prepared', 'payload': {'game_id': game_id}}
+		await websocket_manager.broadcast(json.dumps(message))
+		logger.debug(f'Broadcasted game.questions_prepared for game_id: {game_id}')
+	except Exception as e:
+		logger.error(f'Failed to broadcast game.questions_prepared event: {e}')
+		raise

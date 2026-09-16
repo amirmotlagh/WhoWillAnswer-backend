@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.core.interfaces.category import ICategoryRepository
 
-from app.infrastructure.cache.category_cache import get_category_cache, set_category_cache
+from app.infrastructure.cache.category_cache import CategoryCache
 from app.infrastructure.messaging.publisher import EventPublisher
 from app.schemas.category import CategoryCreate, CategoryResponse
 from app.core.domain.category import CategoryInfo
@@ -18,11 +18,12 @@ class CategoryService:
 		self.publisher = publisher
 
 	async def get_all_categories(self) -> list[CategoryResponse]:
-		categories = await get_category_cache()
+		category_cache = CategoryCache()
+		categories = await category_cache.get_category_cache()
 		if not categories:
 			categories = await self.category_repo.get_all_categories()
 			if categories:
-				await set_category_cache(categories)
+				await category_cache.set_category_cache(categories)
 
 		return [CategoryResponse.model_validate(cat) for cat in categories] if categories else []
 
